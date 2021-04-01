@@ -6,13 +6,7 @@ import (
 	"math"
 )
 
-func main() {
-	for i := int64(0); i < 5; i++ {
-		tree := Number2CalculationTree(i)
-		root, _ := json.Marshal(&tree)
-		fmt.Println(fmt.Sprintf("%3v: %v, %v\n\n\n", i, Base23(i), string(root)))
-	}
-}
+func main() {}
 
 func reverseByteSlice(numbers []byte) []byte {
 	for i := 0; i < len(numbers)/2; i++ {
@@ -52,7 +46,8 @@ func Base23(t int64) []byte {
 // Operation structure
 type Operation struct {
 	N        int
-	Operands []*Operation
+	First    *Operation
+	Second   *Operation
 }
 
 func newOperation(n int) *Operation {
@@ -61,21 +56,18 @@ func newOperation(n int) *Operation {
 
 func (root *Operation) newChilds(n int, base byte, layer *[]*Operation) int {
 	if base == 1 {
-		operation := newOperation(n + 1)
-		root.Operands = append(root.Operands, operation)
-		(*layer) = append(*layer, operation)
+		root.First = newOperation(n + 1)
+		(*layer) = append(*layer, root.First)
 
 	}
 
 	if base == 2 {
-		operation1 := newOperation(n + 1)
-		operation2 := newOperation(n + 2)
-		root.Operands = append(root.Operands, operation1, operation2)
-		(*layer) = append(*layer, operation1, operation2)
-		n++
+		root.First = newOperation(n + 1)
+		root.Second = newOperation(n + 2)
+		(*layer) = append(*layer, root.First ,root.Second)
 	}
-	n = n + 1
-	return n
+
+	return n+1
 }
 
 func (root *Operation) toJSON(prefix string) string {
@@ -91,9 +83,14 @@ func Number2CalculationTree(n int64) *Operation {
 
 	root := newOperation(0)
 	currentLayer := []*Operation{}
+
 	i := root.newChilds(0, base[0], &currentLayer)
+	//fmt.Println(fmt.Sprintf("currentLayerLen:%v", len(currentLayer)))
+	//fmt.Println(fmt.Sprintf("LenBase:%v i:%v", len(base),i))
+
 
 	for i < len(base) && len(currentLayer) > 0 {
+		//fmt.Println(fmt.Sprintf("i:%v", i))
 
 		nextLayer := []*Operation{}
 
@@ -108,7 +105,9 @@ func Number2CalculationTree(n int64) *Operation {
 			i++
 		}
 
-		copy(currentLayer, nextLayer)
+		//fmt.Println(fmt.Sprintf("CurrentLayer:%v", currentLayer))
+
+		currentLayer=nextLayer
 
 	}
 	return root
