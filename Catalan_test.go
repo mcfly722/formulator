@@ -5,5 +5,5 @@ import (
 )
 
 func Test_Brackets(t *testing.T) {
-	NextBracket([]Node{}, 4, 4, printBrackets)
+	NextBracket([]BracketStep{}, 6, 6, printBrackets)
 }

@@ -37,7 +37,13 @@ func (node *Node) ToString() string {
 func printBrackets(tail []BracketStep) {
 	treeRoot := BracketsStepsToBinaryTree(tail)
 
-	fmt.Println(fmt.Sprintf("%v -> %v", BracketsStepsToString(tail), treeRoot.ToString()))
+	root, err := StringToBinaryTree(treeRoot.ToString(), nil)
+
+	if err != nil {
+		fmt.Println(fmt.Sprintf("%v -> %v error:%v", BracketsStepsToString(tail), treeRoot.ToString(), err))
+	}
+
+	fmt.Println(fmt.Sprintf("%v -> %v -> %v equal=%v", BracketsStepsToString(tail), treeRoot.ToString(), root.ToString(), treeRoot.ToString() == root.ToString()))
 
 }
 
@@ -66,6 +72,71 @@ func BracketsStepsToBinaryTree(tail []BracketStep) *Node {
 		}
 	}
 	return root
+}
+
+// StringToBinaryTree deserialize from string to binary tree
+func StringToBinaryTree(input string, parent *Node) (*Node, error) {
+	node := newNode(parent)
+
+	if input == "*" {
+		return node, nil
+	}
+
+	if input[0] == '(' && input[len(input)-1] == ')' {
+		pos := 1
+		bracketsCounter := 1
+		for ; bracketsCounter > 0 && pos < len(input); pos++ {
+			if input[pos] == '(' {
+				bracketsCounter++
+			}
+			if input[pos] == ')' {
+				bracketsCounter--
+			}
+		}
+		if bracketsCounter > 0 {
+			return nil, fmt.Errorf("Opened brackets are not equal to closed in '%v' diff=%v", input, bracketsCounter)
+		}
+
+		if pos == len(input) {
+			return StringToBinaryTree(input[1:len(input)-1], node)
+		}
+
+		childNode1, err := StringToBinaryTree(input[0:pos], node)
+		if err != nil {
+			return nil, err
+		}
+
+		childNode2, err := StringToBinaryTree(input[pos:len(input)], node)
+		if err != nil {
+			return nil, err
+		}
+
+		node.Childs = append(node.Childs, childNode1)
+		node.Childs = append(node.Childs, childNode2)
+		return node, nil
+	}
+
+	if input[0] == '*' {
+		node.Childs = append(node.Childs, newNode(parent))
+		childNode, err := StringToBinaryTree(input[1:len(input)], node)
+		if err != nil {
+			return nil, err
+		}
+		node.Childs = append(node.Childs, childNode)
+		return node, nil
+	}
+
+	if input[0] == '(' && input[len(input)-1] == '*' {
+		childNode, err := StringToBinaryTree(input[1:len(input)-2], node)
+		if err != nil {
+			return nil, err
+		}
+		node.Childs = append(node.Childs, childNode)
+		node.Childs = append(node.Childs, newNode(parent))
+		return node, nil
+	}
+
+	return nil, fmt.Errorf("Could not parse '%v'", input)
 }
 
 // BracketsStepsToString represent bracket steps as string
@@ -103,5 +174,5 @@ func NextBracket(tail []BracketStep, sizeX int, sizeY int, output func([]Bracket
 }
 
 func main() {
-	NextBracket([]BracketStep{}, 6, 6, printBrackets)
+	NextBracket([]BracketStep{}, 4, 4, printBrackets)
 }
