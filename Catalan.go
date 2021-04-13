@@ -43,8 +43,12 @@ func printBrackets(tail []BracketStep) {
 		fmt.Println(fmt.Sprintf("%v -> %v error:%v", BracketsStepsToString(tail), treeRoot.ToString(), err))
 	}
 
-	fmt.Println(fmt.Sprintf("%v -> %v -> %v equal=%v", BracketsStepsToString(tail), treeRoot.ToString(), root.ToString(), treeRoot.ToString() == root.ToString()))
+	nextBrackets, err := getNextBracketsTree(BracketsStepsToString(tail))
+	if err != nil {
+		fmt.Println(fmt.Sprintf("%v error:%v", BracketsStepsToString(tail), err))
+	}
 
+	fmt.Println(fmt.Sprintf("%v -> %v -> %v equal=%v %v", BracketsStepsToString(tail), treeRoot.ToString(), root.ToString(), treeRoot.ToString() == root.ToString(), nextBrackets))
 }
 
 // BracketsStepsToBinaryTree converts brackets steps to binary tree
@@ -137,6 +141,45 @@ func StringToBinaryTree(input string, parent *Node) (*Node, error) {
 	}
 
 	return nil, fmt.Errorf("Could not parse '%v'", input)
+}
+
+// StringToBracketsSteps converts brackets to steps
+func StringToBracketsSteps(input string) ([]BracketStep, int, error) {
+	steps := []BracketStep{}
+	i, x, y := 0, 0, 0
+	for i < len(input) {
+		step := BracketStep{
+			x: 0, y: 0,
+		}
+
+		for ; i < len(input) && input[i] == '('; i++ {
+			step.x++
+			x++
+		}
+
+		for ; i < len(input) && input[i] == ')'; i++ {
+			step.y++
+			y++
+		}
+
+		if i < len(input) && input[i] != '(' && input[i] != ')' {
+			return nil, -1, fmt.Errorf("%v<- unknown symbol", input[0:i])
+		}
+		steps = append(steps, step)
+	}
+
+	if x != y {
+		return nil, -1, fmt.Errorf("number of opened brackets (%v) are not equal to closed (%v)", x, y)
+	}
+	return steps, x, nil
+}
+
+func getNextBracketsTree(input string) (string, error) {
+	steps, size, err := StringToBracketsSteps(input)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%v total:%v", steps, size), nil
 }
 
 // BracketsStepsToString represent bracket steps as string
