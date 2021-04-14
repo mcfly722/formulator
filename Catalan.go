@@ -174,12 +174,61 @@ func StringToBracketsSteps(input string) ([]BracketStep, int, error) {
 	return steps, x, nil
 }
 
+func getNextStepsTail(srcTail []BracketStep, dstTail []BracketStep, sizeX int, sizeY int, previousSolutionAlreadyReached bool) ([]BracketStep, bool, bool) {
+
+	if sizeX == 0 && sizeY == 0 {
+		if !previousSolutionAlreadyReached {
+			return []BracketStep{}, true, false
+		}
+		return dstTail, true, true
+	}
+
+	newDstTail := []BracketStep{}
+
+	startX := 1
+	startY := 1
+
+	if !previousSolutionAlreadyReached && len(srcTail) > 0 {
+		startX = srcTail[0].x
+		startY = srcTail[0].y
+	}
+
+	for i := startX; i <= sizeX; i++ {
+		for j := startY; j <= sizeY-(sizeX-i); j++ {
+
+			newDstTail = append(dstTail, BracketStep{x: i, y: j})
+
+			newSrcTail := []BracketStep{}
+			if len(srcTail) > 0 {
+				newSrcTail = srcTail[1:len(srcTail)]
+			}
+
+			tail, reached, solutionFound := getNextStepsTail(newSrcTail, newDstTail, sizeX-i, sizeY-j, previousSolutionAlreadyReached)
+
+			previousSolutionAlreadyReached = reached
+
+			if solutionFound {
+				return tail, previousSolutionAlreadyReached, solutionFound
+			}
+
+		}
+	}
+	return []BracketStep{}, previousSolutionAlreadyReached, false
+}
+
 func getNextBracketsTree(input string) (string, error) {
-	steps, size, err := StringToBracketsSteps(input)
+	tail, size, err := StringToBracketsSteps(input)
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%v total:%v", steps, size), nil
+
+	nextTail, _, solutionFound := getNextStepsTail(tail, []BracketStep{}, size, size, false)
+
+	if !solutionFound {
+		return fmt.Sprintf("%v -> %v", tail, "next solution not found"), nil
+	}
+
+	return fmt.Sprintf("%v -> %v", tail, nextTail), nil
 }
 
 // BracketsStepsToString represent bracket steps as string
