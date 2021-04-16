@@ -1,9 +1,11 @@
-package main
+package catalan
 
 import (
 	"fmt"
 	"testing"
 )
+
+// go test -v
 
 func nextBracket(tail []BracketStep, sizeX int, sizeY int, output *[]string) {
 
@@ -107,6 +109,16 @@ func Test_FirstNBrackets(t *testing.T) {
 			t.Errorf("getNextBracketsTree('%v') returned error:%v", currentSequence, err)
 		}
 		t.Log(fmt.Sprintf("%v %v -> %v", i, currentSequence, next))
+		currentSequence = next
+	}
+}
+
+// go test -bench .
+
+func BenchmarkGetNextBracketsTree(b *testing.B) {
+	currentSequence := "()"
+	for n := 0; n < b.N; n++ {
+		next, _ := GetNextBracketsTree(currentSequence)
 		currentSequence = next
 	}
 }
