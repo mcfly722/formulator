@@ -164,10 +164,7 @@ func BracketsToExpressionTree(input string) (*Expression, error) {
 			}
 
 			if counter == 0 {
-				argument, err := BracketsToExpressionTree(input[from+1 : i])
-				if err != nil {
-					return nil, err
-				}
+				argument, _ := BracketsToExpressionTree(input[from+1 : i])
 				if argument != nil {
 					root.Arguments = append(root.Arguments, argument)
 				}
