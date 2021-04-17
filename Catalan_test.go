@@ -1,6 +1,7 @@
 package catalan
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 )
@@ -30,7 +31,7 @@ func Test_Sequence(t *testing.T) {
 
 	currentSequence := solutions1[0]
 	for i := 0; i < len(solutions1); i++ {
-		next, err := GetNextBracketsTree(currentSequence)
+		next, err := GetNextBracketsSequence(currentSequence)
 		if err != nil {
 			t.Errorf("getNextBracketsTree('%v') returned error:%v", currentSequence, err)
 		}
@@ -46,8 +47,8 @@ func Test_Sequence(t *testing.T) {
 	}
 }
 
-func testSequenceError(t *testing.T, testSequence string) {
-	_, err := GetNextBracketsTree(testSequence)
+func testGetNextBracketsSequenceError(t *testing.T, testSequence string) {
+	_, err := GetNextBracketsSequence(testSequence)
 
 	if err == nil {
 		t.Errorf("error for '%v' sequence does not catched", testSequence)
@@ -56,8 +57,8 @@ func testSequenceError(t *testing.T, testSequence string) {
 	}
 }
 
-func testSequenceSuccess(t *testing.T, testSequence string, expectingAnswer string) {
-	answer, err := GetNextBracketsTree(testSequence)
+func testGetNextBracketsSequenceSuccess(t *testing.T, testSequence string, expectingAnswer string) {
+	answer, err := GetNextBracketsSequence(testSequence)
 
 	if err != nil {
 		t.Errorf("error for %v :%v", testSequence, err)
@@ -70,41 +71,41 @@ func testSequenceSuccess(t *testing.T, testSequence string, expectingAnswer stri
 }
 
 func Test_Empty(t *testing.T) {
-	testSequenceError(t, "")
+	testGetNextBracketsSequenceError(t, "")
 }
 
-func Test_IncorrectSymbolFromStart(t *testing.T) {
-	testSequenceError(t, "a(()(()))")
+func Test_GetNextBracketsSequence_IncorrectSymbolFromStart(t *testing.T) {
+	testGetNextBracketsSequenceError(t, "a(()(()))")
 }
 
-func Test_IncorrectSymbolAtTheEnd(t *testing.T) {
-	testSequenceError(t, "(()(()))b")
+func Test_GetNextBracketsSequence_IncorrectSymbolAtTheEnd(t *testing.T) {
+	testGetNextBracketsSequenceError(t, "(()(()))b")
 }
 
-func Test_IncorrectSymbolInTheMiddle(t *testing.T) {
-	testSequenceError(t, "(()((c)))")
+func Test_GetNextBracketsSequence_IncorrectSymbolInTheMiddle(t *testing.T) {
+	testGetNextBracketsSequenceError(t, "(()((c)))")
 }
 
-func Test_LostOpeningBracket(t *testing.T) {
-	testSequenceError(t, "())")
+func Test_GetNextBracketsSequence_LostOpeningBracket(t *testing.T) {
+	testGetNextBracketsSequenceError(t, "())")
 }
 
-func Test_LostClosingBracket(t *testing.T) {
-	testSequenceError(t, "(()")
+func Test_GetNextBracketsSequence_LostClosingBracket(t *testing.T) {
+	testGetNextBracketsSequenceError(t, "(()")
 }
 
-func Test_WrongBracketsSequence(t *testing.T) {
-	testSequenceError(t, "())(")
+func Test_GetNextBracketsSequence_WrongBracketsSequence(t *testing.T) {
+	testGetNextBracketsSequenceError(t, "())(")
 }
 
-func Test_FirstBracket(t *testing.T) {
-	testSequenceSuccess(t, "()", "()()")
+func Test_GetNextBracketsSequence_FirstBracket(t *testing.T) {
+	testGetNextBracketsSequenceSuccess(t, "()", "()()")
 }
 
-func Test_FirstNBrackets(t *testing.T) {
+func Test_GetNextBracketsSequence_FirstNBrackets(t *testing.T) {
 	currentSequence := "()"
 	for i := 0; i < 120; i++ {
-		next, err := GetNextBracketsTree(currentSequence)
+		next, err := GetNextBracketsSequence(currentSequence)
 		if err != nil {
 			t.Errorf("getNextBracketsTree('%v') returned error:%v", currentSequence, err)
 		}
@@ -113,12 +114,89 @@ func Test_FirstNBrackets(t *testing.T) {
 	}
 }
 
+func Test_BracketsToExpressionTree(t *testing.T) {
+	bracketSequence := "()((())())"
+	expression, err := BracketsToExpressionTree(bracketSequence)
+	if err != nil {
+		t.Errorf("Cant build expression tree for %v. Error: %v", bracketSequence, err)
+	}
+
+	bytes, err := json.Marshal(expression)
+	if err != nil {
+		t.Errorf("Can't serialize %v. Error:%v", bracketSequence, err)
+	}
+	t.Log(string(bytes))
+
+}
+
+func testBracketsToExpressionTreeError(t *testing.T, testSequence string) {
+	_, err := BracketsToExpressionTree(testSequence)
+
+	if err == nil {
+		t.Errorf("error for '%v' sequence does not catched", testSequence)
+	} else {
+		t.Log(fmt.Sprintf("error for '%v' successfully catched.\nerror description:%v", testSequence, err))
+	}
+}
+
+func testBracketsToExpressionTreeSuccess(t *testing.T, testSequence string) {
+	expression, err := BracketsToExpressionTree(testSequence)
+
+	if err != nil {
+		t.Errorf("error for %v :%v", testSequence, err)
+	}
+
+	bytes, err := json.Marshal(expression)
+	if err != nil {
+		t.Errorf("Can't serialize %v. Error:%v", testSequence, err)
+	}
+	t.Log(string(bytes))
+}
+
+func Test_BracketsToExpressionTree_IncorrectSymbolFromStart(t *testing.T) {
+	testBracketsToExpressionTreeError(t, "a(()(()))")
+}
+
+func Test_BracketsToExpressionTree_IncorrectSymbolAtTheEnd(t *testing.T) {
+	testBracketsToExpressionTreeError(t, "(()(()))b")
+}
+
+func Test_BracketsToExpressionTree_IncorrectSymbolInTheMiddle(t *testing.T) {
+	testBracketsToExpressionTreeError(t, "(()((c)))")
+}
+
+func Test_BracketsToExpressionTree_LostOpeningBracket(t *testing.T) {
+	testBracketsToExpressionTreeError(t, "())")
+}
+
+func Test_BracketsToExpressionTree_LostClosingBracket(t *testing.T) {
+	testBracketsToExpressionTreeError(t, "(()")
+}
+
+func Test_BracketsToExpressionTree_WrongBracketsSequence(t *testing.T) {
+	testBracketsToExpressionTreeError(t, "())(")
+}
+
+func Test_BracketsToExpressionTree_FirstBracket(t *testing.T) {
+	testBracketsToExpressionTreeSuccess(t, "()")
+}
+
 // go test -bench .
 
-func BenchmarkGetNextBracketsTree(b *testing.B) {
+func BenchmarkGetNextBracketsSequence(b *testing.B) {
 	currentSequence := "()"
 	for n := 0; n < b.N; n++ {
-		next, _ := GetNextBracketsTree(currentSequence)
+		next, _ := GetNextBracketsSequence(currentSequence)
 		currentSequence = next
+	}
+}
+
+func BenchmarkBracketsToExpressionTree(b *testing.B) {
+	currentSequence := "()((())())((()((())())))"
+	for n := 0; n < b.N; n++ {
+		_, err := BracketsToExpressionTree(currentSequence)
+		if err != nil {
+			b.Errorf("error:%v", err)
+		}
 	}
 }

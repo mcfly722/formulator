@@ -8,6 +8,11 @@ type BracketStep struct {
 	y int
 }
 
+// Expression from bracket
+type Expression struct {
+	Arguments []*Expression
+}
+
 func stringToBracketsSteps(input string) ([]BracketStep, int, error) {
 	if input == "" {
 		return nil, -1, fmt.Errorf("could not parse empty string, use () for first sequence instead")
@@ -97,8 +102,8 @@ func getNextStepsTail(srcTail []BracketStep, dstTail []BracketStep, sizeX int, s
 	return []BracketStep{}, previousSolutionAlreadyReached, false
 }
 
-// GetNextBracketsTree generates next brackets tree sequence based on previous one from input
-func GetNextBracketsTree(input string) (string, error) {
+// GetNextBracketsSequence generates next brackets tree sequence based on previous one from input
+func GetNextBracketsSequence(input string) (string, error) {
 
 	tail, size, err := stringToBracketsSteps(input)
 	if err != nil {
@@ -118,7 +123,6 @@ func GetNextBracketsTree(input string) (string, error) {
 	return bracketsStepsToString(nextTail), nil
 }
 
-// BracketsStepsToString represent bracket steps as string
 func bracketsStepsToString(tail []BracketStep) string {
 	output := ""
 	for _, step := range tail {
@@ -130,6 +134,57 @@ func bracketsStepsToString(tail []BracketStep) string {
 		}
 	}
 	return output
+}
+
+// BracketsToExpressionTree generates expression tree based on string of brackets
+func BracketsToExpressionTree(input string) (*Expression, error) {
+	root := Expression{Arguments: []*Expression{}}
+
+	if input == "" {
+		return &root, nil
+	}
+
+	counter := 0
+	from := 0
+
+	for i := 0; i < len(input); i++ {
+
+		if input[i] == '(' {
+			if counter == 0 {
+				from = i
+			}
+			counter++
+		}
+
+		if input[i] == ')' {
+			counter--
+
+			if counter < 0 {
+				return nil, fmt.Errorf("%v<- incorrect brackets balance, could not close not opened bracket", input[0:i+1])
+			}
+
+			if counter == 0 {
+				argument, err := BracketsToExpressionTree(input[from+1 : i])
+				if err != nil {
+					return nil, err
+				}
+				if argument != nil {
+					root.Arguments = append(root.Arguments, argument)
+				}
+			}
+
+		}
+
+		if input[i] != '(' && input[i] != ')' {
+			return nil, fmt.Errorf("%v<- unknown symbol", input[0:i+1])
+		}
+	}
+
+	if counter != 0 {
+		return nil, fmt.Errorf("number of opened brackets are not equal to closed (difference=%v)", counter)
+	}
+
+	return &root, nil
 }
 
 func main() {}
