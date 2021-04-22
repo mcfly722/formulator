@@ -181,6 +181,47 @@ func Test_BracketsToExpressionTree_FirstBracket(t *testing.T) {
 	testBracketsToExpressionTreeSuccess(t, "()")
 }
 
+func Test_NewCombination_success(t *testing.T) {
+	n := 2
+	k := 5
+	sequence, err := NewCombination(n, k)
+	if err != nil {
+		t.Errorf("Error:%v", err)
+		return
+	}
+	if len(sequence) != k {
+		t.Errorf(fmt.Sprintf("wrong sequence len(%v) != %v", sequence, k))
+		return
+	}
+
+	t.Log(fmt.Sprintf("new combination %v from %v is %v len=%v is correct", n, k, sequence, len(sequence)))
+}
+
+func Test_CombinationNKNext(t *testing.T) {
+	currentSequence, err := NewCombination(2, 5)
+	if err != nil {
+		t.Errorf("Error:%v", err)
+		return
+	}
+
+	finished := false
+	for i := 0; finished == false; i++ {
+
+		combination, finishedTmp, err := CombinationNKNext(currentSequence, 2)
+
+		if err != nil {
+			t.Errorf("Error:%v", err)
+			return
+		}
+
+		finished = finishedTmp
+
+		t.Log(fmt.Sprintf("%2v %v", i+1, combination))
+		currentSequence = combination
+	}
+
+}
+
 // go test -bench .
 
 func BenchmarkGetNextBracketsSequence(b *testing.B) {

@@ -184,4 +184,98 @@ func BracketsToExpressionTree(input string) (*Expression, error) {
 	return &root, nil
 }
 
-func main() {}
+// NewCombination initialize new combination for k elements
+func NewCombination(n int, k int) (string, error) {
+	if k < 1 || n < 1 {
+		return "", fmt.Errorf("Could not initialize new combination %v from %v", n, k)
+	}
+
+	output := ""
+	for i := 0; i < n; i++ {
+		output += "*"
+	}
+
+	for i := n; i < k; i++ {
+		output += "."
+	}
+	return output, nil
+}
+
+func combinationString2array(input string) ([]int, error) {
+	output := []int{}
+
+	if input == "" {
+		return nil, fmt.Errorf("could not parse empty combination")
+	}
+
+	counter := 0
+	for i := 0; i < len(input); i++ {
+		if input[i] == '*' {
+			output = append(output, counter)
+			counter = 0
+		}
+		if input[i] == '.' {
+			counter++
+		}
+
+		if input[i] != '.' && input[i] != '*' {
+			return nil, fmt.Errorf(fmt.Sprintf("%v<- unknown symbol", input[0:i]))
+		}
+	}
+
+	return output, nil
+}
+
+func array2combinationString(combination []int, size int) string {
+	output := ""
+	for i := 0; i < size; i++ {
+
+		if i < len(combination) {
+			for j := 0; j < combination[i]; j++ {
+				output += "."
+			}
+			output += "*"
+		}
+	}
+
+	for i := len(output); i < size; i++ {
+		output += "."
+	}
+
+	return output
+}
+
+func combinationRecursiveIterator(currentSequence []int, depth int, leftSum int, totalSize int) {
+	if depth == 0 {
+		fmt.Println(fmt.Sprintf("%v - %v", currentSequence, array2combinationString(currentSequence, totalSize)))
+	} else {
+		for i := 0; i <= leftSum; i++ {
+			newSequence := append(currentSequence, i)
+			combinationRecursiveIterator(newSequence, depth-1, leftSum-i, totalSize)
+		}
+	}
+
+}
+
+// CombinationNKNext generates next combination
+func CombinationNKNext(input string, n int) (string, bool, error) {
+
+	i := "***.."
+	combination, err := combinationString2array(i)
+
+	if err != nil {
+		return "", false, err
+	}
+	/*
+		nextCombination, finished := combinationRecursiveIterator(combination, 0, len(i))
+		return fmt.Sprintf("%v", combination), true, nil
+	*/
+
+	combinationRecursiveIterator([]int{}, len(combination), len(i)-len(combination), len(i))
+	return fmt.Sprintf("%v", combination), true, nil
+
+}
+
+func main() {
+
+}
