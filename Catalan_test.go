@@ -198,16 +198,18 @@ func Test_NewCombination_success(t *testing.T) {
 }
 
 func Test_CombinationNKNext(t *testing.T) {
-	currentSequence, err := NewCombination(2, 5)
+	currentSequence, err := NewCombination(3, 8)
+
 	if err != nil {
 		t.Errorf("Error:%v", err)
 		return
 	}
 
 	finished := false
-	for i := 0; finished == false; i++ {
+	for i := 1; finished == false; i++ {
+		t.Log(fmt.Sprintf("%2v %v", i, currentSequence))
 
-		combination, finishedTmp, err := CombinationNKNext(currentSequence, 2)
+		combination, finishedTmp, err := CombinationNKNext(currentSequence)
 
 		if err != nil {
 			t.Errorf("Error:%v", err)
@@ -216,7 +218,6 @@ func Test_CombinationNKNext(t *testing.T) {
 
 		finished = finishedTmp
 
-		t.Log(fmt.Sprintf("%2v %v", i+1, combination))
 		currentSequence = combination
 	}
 

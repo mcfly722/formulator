@@ -245,37 +245,50 @@ func array2combinationString(combination []int, size int) string {
 	return output
 }
 
-func combinationRecursiveIterator(currentSequence []int, depth int, leftSum int, totalSize int) {
+func combinationRecursiveIterator(originalSequence []int, currentSequence []int, depth int, leftSum int, totalSize int, previousSolutionAlreadyReached bool) ([]int, bool, bool) {
 	if depth == 0 {
-		fmt.Println(fmt.Sprintf("%v - %v", currentSequence, array2combinationString(currentSequence, totalSize)))
-	} else {
-		for i := 0; i <= leftSum; i++ {
-			newSequence := append(currentSequence, i)
-			combinationRecursiveIterator(newSequence, depth-1, leftSum-i, totalSize)
+		if !previousSolutionAlreadyReached {
+			return currentSequence, true, false
 		}
+		return currentSequence, true, true
 	}
+	start := 0
+
+	if !previousSolutionAlreadyReached {
+		start = originalSequence[len(originalSequence)-depth]
+	}
+
+	for i := start; i <= leftSum; i++ {
+
+		newSequence := append(currentSequence, i)
+		solution, reached, found := combinationRecursiveIterator(originalSequence, newSequence, depth-1, leftSum-i, totalSize, previousSolutionAlreadyReached)
+
+		if found {
+			return solution, reached, found
+		}
+		previousSolutionAlreadyReached = reached
+	}
+
+	return nil, previousSolutionAlreadyReached, false
 
 }
 
 // CombinationNKNext generates next combination
-func CombinationNKNext(input string, n int) (string, bool, error) {
+func CombinationNKNext(input string) (string, bool, error) {
 
-	i := "***.."
-	combination, err := combinationString2array(i)
+	combination, err := combinationString2array(input)
 
 	if err != nil {
 		return "", false, err
 	}
-	/*
-		nextCombination, finished := combinationRecursiveIterator(combination, 0, len(i))
-		return fmt.Sprintf("%v", combination), true, nil
-	*/
 
-	combinationRecursiveIterator([]int{}, len(combination), len(i)-len(combination), len(i))
-	return fmt.Sprintf("%v", combination), true, nil
+	solution, _, found := combinationRecursiveIterator(combination, []int{}, len(combination), len(input)-len(combination), len(input), false)
+	if found {
+		return array2combinationString(solution, len(input)), false, nil
+	}
 
-}
-
-func main() {
+	return "", true, nil
 
 }
+
+func main() {}
