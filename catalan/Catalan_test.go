@@ -207,7 +207,7 @@ func Test_CombinationNKNext(t *testing.T) {
 
 	finished := false
 	for i := 1; finished == false; i++ {
-		t.Log(fmt.Sprintf("%2v %v", i, currentSequence))
+		t.Log(fmt.Sprintf("%2v %v = %v", i, currentSequence, Combination2Int(currentSequence)))
 
 		combination, finishedTmp, err := CombinationNKNext(currentSequence)
 

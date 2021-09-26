@@ -275,7 +275,6 @@ func combinationRecursiveIterator(originalSequence []int, currentSequence []int,
 
 // CombinationNKNext generates next combination
 func CombinationNKNext(input string) (string, bool, error) {
-
 	combination, err := combinationString2array(input)
 
 	if err != nil {
@@ -289,6 +288,18 @@ func CombinationNKNext(input string) (string, bool, error) {
 
 	return "", true, nil
 
+}
+
+// Combination2Int converts combination to integer
+func Combination2Int(input string) int {
+	output := 0
+	for i := 0; i < len(input); i++ {
+		output = output * 2
+		if input[i] == '*' {
+			output = output + 1
+		}
+	}
+	return output
 }
 
 func main() {}
