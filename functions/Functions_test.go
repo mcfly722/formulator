@@ -27,7 +27,7 @@ func Test_FunctionsRound(t *testing.T) {
 
 }
 
-func Test_FunctionsRFecombination(t *testing.T) {
+func Test_FunctionsRecombination(t *testing.T) {
 
 	i := 0
 
