@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"strings"
 	"testing"
 	"time"
 )
@@ -42,4 +43,27 @@ func Test_AbsPower(t *testing.T) {
 		t.Log(expression)
 	}
 
+}
+
+func Test_OperatorsRecombination(t *testing.T) {
+
+	i := 1
+
+	ready := func(current []*Operator) {
+		operators := []string{}
+		for _, operator := range current {
+			operators = append(operators, operator.Separator)
+		}
+		t.Log(fmt.Sprintf("%4v) %v", i, strings.Join(operators, " ")))
+
+		i++
+	}
+
+	addOperator := newOperator(func(a float64, b float64) float64 { return a + b }, "+")
+	multiplyOperator := newOperator(func(a float64, b float64) float64 { return a * b }, "*")
+	powerOperator := newOperator(func(a float64, b float64) float64 { return math.Pow(math.Abs(a), b) }, "^")
+
+	availableOperatorsTypes := []*Operator{addOperator, multiplyOperator, powerOperator}
+
+	Recombination(availableOperatorsTypes, 4, ready)
 }
