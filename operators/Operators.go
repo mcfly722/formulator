@@ -28,18 +28,18 @@ func (o Operator) OperatorExpressionToString(a string, b string) string {
 	return fmt.Sprintf("%v %v %v", a, o.Separator, b)
 }
 
-func recombine(combination []*Operator, availableOperators []*Operator, depth int, ready func(current []*Operator)) {
-	if depth > 0 {
+func recombine(availableOperators []*Operator, combination []*Operator, position int, ready func()) {
+	if position < len(combination) {
 		for _, operator := range availableOperators {
-			newCombination := append(combination, operator)
-			recombine(newCombination, availableOperators, depth-1, ready)
+			combination[position] = operator
+			recombine(availableOperators, combination, position+1, ready)
 		}
 	} else {
-		ready(combination)
+		ready()
 	}
 }
 
 // Recombination for operators
-func Recombination(availableOperators []*Operator, combinationLenght int, ready func(current []*Operator)) {
-	recombine([]*Operator{}, availableOperators, combinationLenght, ready)
+func Recombination(availableOperators []*Operator, combination []*Operator, ready func()) {
+	recombine(availableOperators, combination, 0, ready)
 }

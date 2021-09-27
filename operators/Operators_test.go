@@ -47,11 +47,19 @@ func Test_AbsPower(t *testing.T) {
 
 func Test_OperatorsRecombination(t *testing.T) {
 
+	addOperator := newOperator(func(a float64, b float64) float64 { return a + b }, "+")
+	multiplyOperator := newOperator(func(a float64, b float64) float64 { return a * b }, "*")
+	powerOperator := newOperator(func(a float64, b float64) float64 { return math.Pow(math.Abs(a), b) }, "^")
+
+	availableOperatorsTypes := []*Operator{addOperator, multiplyOperator, powerOperator}
+
+	combination := []*Operator{nil, nil, nil, nil, nil}
+
 	i := 1
 
-	ready := func(current []*Operator) {
+	ready := func() {
 		operators := []string{}
-		for _, operator := range current {
+		for _, operator := range combination {
 			operators = append(operators, operator.Separator)
 		}
 		t.Log(fmt.Sprintf("%4v) %v", i, strings.Join(operators, " ")))
@@ -59,11 +67,5 @@ func Test_OperatorsRecombination(t *testing.T) {
 		i++
 	}
 
-	addOperator := newOperator(func(a float64, b float64) float64 { return a + b }, "+")
-	multiplyOperator := newOperator(func(a float64, b float64) float64 { return a * b }, "*")
-	powerOperator := newOperator(func(a float64, b float64) float64 { return math.Pow(math.Abs(a), b) }, "^")
-
-	availableOperatorsTypes := []*Operator{addOperator, multiplyOperator, powerOperator}
-
-	Recombination(availableOperatorsTypes, 4, ready)
+	Recombination(availableOperatorsTypes, combination, ready)
 }
