@@ -2,51 +2,28 @@ package operators
 
 import (
 	"fmt"
-	"math"
 )
 
-// Add = a + b
-const Add = 9237812 + 1
-
-// Multiply = a * b
-const Multiply = 9237812 + 2
-
-// AbsPower = Abs(a) * b
-const AbsPower = 9237812 + 3
-
-// Operator structure represent operator
+// Operator structure
 type Operator struct {
-	oType int
+	f         func(a float64, b float64) float64
+	separator string
 }
 
-func newOperator(operatorType int) *Operator {
-	return &Operator{oType: operatorType}
+// Constructor
+func newOperator(calculator func(a float64, b float64) float64, _separator string) *Operator {
+	return &Operator{
+		f:         calculator,
+		separator: _separator,
+	}
 }
 
-// Calculate function return calculated expression with a and b
+// Calculate function
 func (o Operator) Calculate(a float64, b float64) float64 {
-	switch o.oType {
-	case Add:
-		return a + b
-	case Multiply:
-		return a * b
-	case AbsPower:
-		return math.Pow(math.Abs(a), b)
-	default:
-		return ^0
-	}
+	return o.f(a, b)
 }
 
-// OperatorExpressionToString prints operator expression
+// OperatorExpressionToString string representation of operator
 func (o Operator) OperatorExpressionToString(a string, b string) string {
-	switch o.oType {
-	case Add:
-		return fmt.Sprintf("%v + %v", a, b)
-	case Multiply:
-		return fmt.Sprintf("%v * %v", a, b)
-	case AbsPower:
-		return fmt.Sprintf("%v ^ %v", a, b)
-	default:
-		return fmt.Sprintf("unknown operator type = %v", o.oType)
-	}
+	return fmt.Sprintf("%v %v %v", a, o.separator, b)
 }
