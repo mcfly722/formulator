@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-const constantIterationIndex = 0
-const constantPreviousIterationValue = 1
-const constantArgument = 2
+const constantIterationIndex = 2147483648 + 1
+const constantPreviousIterationValue = 2147483648 + 2
+const constantArgument = 2147483648 + 3
 
 func nextCombinationDigit(constants *[]float64,
 	combination []float64,
