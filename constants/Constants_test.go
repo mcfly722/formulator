@@ -10,12 +10,12 @@ import (
 func Test_ConstantsCombinations(t *testing.T) {
 	i := 1
 
-	constants := []float64{constantIterationIndex, constantPreviousIterationValue, constantArgument}
+	constants := []float64{3, constantIterationIndex, constantPreviousIterationValue, constantArgument}
 
 	ready := func(constantsCombination []float64) {
-		t.Log(fmt.Sprintf("%5v %v", i, constantsCombination))
+		t.Log(fmt.Sprintf("%3v) %v", i, CombinationToString(constantsCombination, " ")))
 		i++
 	}
 
-	Recombination(&constants, 3, 1, 2, 3, ready)
+	Recombination(&constants, 3, 1, 2, 3, true, ready)
 }
