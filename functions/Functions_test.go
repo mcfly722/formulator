@@ -29,7 +29,7 @@ func Test_FunctionsRound(t *testing.T) {
 
 func Test_FunctionsRecombination(t *testing.T) {
 
-	i := 0
+	i := 1
 
 	ready := func(current []*Function) {
 		functions := []string{}
