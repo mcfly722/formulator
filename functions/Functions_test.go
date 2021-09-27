@@ -29,18 +29,6 @@ func Test_FunctionsRound(t *testing.T) {
 
 func Test_FunctionsRecombination(t *testing.T) {
 
-	i := 1
-
-	ready := func(current []*Function) {
-		functions := []string{}
-		for _, function := range current {
-			functions = append(functions, function.Name)
-		}
-		t.Log(fmt.Sprintf("%4v) %v", i, strings.Join(functions, " , ")))
-
-		i++
-	}
-
 	roundFunction := newFunction(func(a float64) float64 { return math.Round(a) }, "round")
 
 	// returns 0 = 0, if odd = 1, even = -1
@@ -56,5 +44,19 @@ func Test_FunctionsRecombination(t *testing.T) {
 
 	availableFunctionsTypes := []*Function{roundFunction, oddFunction}
 
-	Recombination(availableFunctionsTypes, 5, ready)
+	combination := []*Function{nil, nil, nil, nil, nil}
+
+	i := 1
+	ready := func() {
+
+		functions := []string{}
+		for _, function := range combination {
+			functions = append(functions, function.Name)
+		}
+		t.Log(fmt.Sprintf("%4v) %v", i, strings.Join(functions, " , ")))
+
+		i++
+	}
+
+	Recombination(availableFunctionsTypes, combination, ready)
 }

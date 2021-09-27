@@ -26,18 +26,18 @@ func (function Function) FunctionExpressionToString(argument string) string {
 	return fmt.Sprintf("%v(%v)", function.Name, argument)
 }
 
-func recombine(combination []*Function, availableFunctions []*Function, depth int, ready func(current []*Function)) {
-	if depth > 0 {
+func recombine(availableFunctions []*Function, combination []*Function, position int, ready func()) {
+	if position < len(combination) {
 		for _, function := range availableFunctions {
-			newCombination := append(combination, function)
-			recombine(newCombination, availableFunctions, depth-1, ready)
+			(combination)[position] = function
+			recombine(availableFunctions, combination, position+1, ready)
 		}
 	} else {
-		ready(combination)
+		ready()
 	}
 }
 
 // Recombination for functions
-func Recombination(availableFunctions []*Function, combinationLenght int, ready func(current []*Function)) {
-	recombine([]*Function{}, availableFunctions, combinationLenght, ready)
+func Recombination(availableFunctions []*Function, combination []*Function, ready func()) {
+	recombine(availableFunctions, combination, 0, ready)
 }
