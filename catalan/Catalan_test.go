@@ -11,7 +11,7 @@ import (
 func nextBracket(tail []BracketStep, sizeX int, sizeY int, output *[]string) {
 
 	if sizeX == 0 && sizeY == 0 {
-		*output = append(*output, bracketsStepsToString(tail))
+		*output = append(*output, BracketsStepsToString(tail))
 		return
 	}
 

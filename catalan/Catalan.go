@@ -13,7 +13,8 @@ type Expression struct {
 	Arguments []*Expression
 }
 
-func stringToBracketsSteps(input string) ([]BracketStep, int, error) {
+// StringToBracketsSteps converts string to bracketSteps
+func StringToBracketsSteps(input string) ([]BracketStep, int, error) {
 	if input == "" {
 		return nil, -1, fmt.Errorf("could not parse empty string, use () for first sequence instead")
 	}
@@ -105,7 +106,7 @@ func getNextStepsTail(srcTail []BracketStep, dstTail []BracketStep, sizeX int, s
 // GetNextBracketsSequence generates next brackets tree sequence based on previous one from input
 func GetNextBracketsSequence(input string) (string, error) {
 
-	tail, size, err := stringToBracketsSteps(input)
+	tail, size, err := StringToBracketsSteps(input)
 	if err != nil {
 		return "", err
 	}
@@ -120,10 +121,11 @@ func GetNextBracketsSequence(input string) (string, error) {
 		return output, nil
 	}
 
-	return bracketsStepsToString(nextTail), nil
+	return BracketsStepsToString(nextTail), nil
 }
 
-func bracketsStepsToString(tail []BracketStep) string {
+// BracketsStepsToString serialize bracketSteps to String
+func BracketsStepsToString(tail []BracketStep) string {
 	output := ""
 	for _, step := range tail {
 		for i := 0; i < step.x; i++ {
