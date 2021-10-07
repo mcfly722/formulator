@@ -15,6 +15,8 @@ func Test_Compilation(t *testing.T) {
 
 	bracketSteps, _, _ := catalan.StringToBracketsSteps(sequence)
 
+	fmt.Println(catalan.BracketsStepsToString(bracketSteps))
+
 	a, _ := json.MarshalIndent(bracketSteps, "", "   ")
 	fmt.Println(string(a))
 
