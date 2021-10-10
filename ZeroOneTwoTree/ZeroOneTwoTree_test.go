@@ -24,5 +24,51 @@ func Test_Recombines(t *testing.T) {
 		i++
 	}
 
-	Recombine(6, ready)
+	Recombine(4, 2, ready)
+}
+
+func testBracketsForError(t *testing.T, brackets string) {
+	_, err := GetNextTree(brackets)
+	if err != nil {
+		t.Log(fmt.Sprintf("correct error handling for %v -> %v", brackets, err))
+	} else {
+		t.Errorf("GetNextTree('%v') not returned error", brackets)
+	}
+}
+
+func Test_BracketsOpensCloses(t *testing.T) {
+	testBracketsForError(t, "(())(")
+}
+
+func Test_BracketsUnexpectedSymbol1(t *testing.T) {
+	testBracketsForError(t, "(())!()")
+}
+
+func Test_BracketsUnexpectedSymbol2(t *testing.T) {
+	testBracketsForError(t, "(())(!)")
+}
+
+func Test_BracketsUnexpectedSymbol3(t *testing.T) {
+	testBracketsForError(t, "(())()!")
+}
+
+func Test_BracketsUnexpectedSymbol4(t *testing.T) {
+	testBracketsForError(t, "!(())()")
+}
+
+func Test_BracketsClosesGreaterThanOpens(t *testing.T) {
+	testBracketsForError(t, "((())))()")
+}
+
+func Test_GetNextTree(t *testing.T) {
+
+	tree := "(()())()"
+
+	nextTree, err := GetNextTree(tree)
+	if err != nil {
+		t.Errorf("GetNextTree('%v') returned error:%v", tree, err)
+	}
+
+	t.Log(fmt.Sprintf("%v -> %v", tree, nextTree))
+
 }
