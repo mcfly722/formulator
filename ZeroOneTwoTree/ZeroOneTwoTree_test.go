@@ -9,7 +9,7 @@ func Test_Recombines(t *testing.T) {
 
 	i := 1
 
-	ready := func(bracketsStack []Point, diagonal [32]int) {
+	ready := func(bracketsStack []BracketStep, diagonal [32]int) {
 		representation := ""
 		for _, point := range bracketsStack {
 			for opens := 0; opens < point.Opens; opens++ {
@@ -62,13 +62,14 @@ func Test_BracketsClosesGreaterThanOpens(t *testing.T) {
 
 func Test_GetNextTree(t *testing.T) {
 
-	tree := "(()())()"
+	tree := "()"
 
-	nextTree, err := GetNextTree(tree)
-	if err != nil {
-		t.Errorf("GetNextTree('%v') returned error:%v", tree, err)
+	for i := 1; i < 20; i++ {
+		nextTree, err := GetNextTree(tree)
+		if err != nil {
+			t.Errorf("GetNextTree('%v') returned error:%v", tree, err)
+		}
+		t.Log(fmt.Sprintf("%3v) %v -> %v", i, tree, nextTree))
+		tree = nextTree
 	}
-
-	t.Log(fmt.Sprintf("%v -> %v", tree, nextTree))
-
 }

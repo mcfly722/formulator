@@ -10,14 +10,13 @@ type Node struct {
 	Childs []*Node
 }
 
-// Point represent number of opened and closed brackets
-type Point struct {
+// BracketStep represent number of opened and closed brackets
+type BracketStep struct {
 	Opens  int
 	Closes int
 }
 
-func recursion(_x int, _y int, bracketsStack []Point, maxChilds int, diagonal [32]int, maxBracketPairs int, ready func(bracketsStack []Point, diagonal [32]int)) {
-
+func recursion(_x int, _y int, bracketsStack []BracketStep, maxChilds int, diagonal [32]int, maxBracketPairs int, ready func(bracketsStack []BracketStep, diagonal [32]int)) {
 	if _x == maxBracketPairs && _y == maxBracketPairs {
 		//ready
 		ready(bracketsStack, diagonal)
@@ -28,30 +27,27 @@ func recursion(_x int, _y int, bracketsStack []Point, maxChilds int, diagonal [3
 				for y := _y + 1; y <= maxBracketPairs; y++ {
 					if y <= x {
 						if diagonal[x-y] < maxChilds+1 {
-							newBracketsStack := append(bracketsStack, Point{Opens: x - _x, Closes: y - _y})
+							newBracketsStack := append(bracketsStack, BracketStep{Opens: x - _x, Closes: y - _y})
 							recursion(x, y, newBracketsStack, maxChilds, diagonal, maxBracketPairs, ready)
 						}
 					}
 				}
 			}
-
 		}
-
 	}
-
 }
 
 // Recombine all binary trees
-func Recombine(maxBracketPairs int, maxChilds int, ready func(bracketsStack []Point, diagonal [32]int)) {
+func Recombine(maxBracketPairs int, maxChilds int, ready func(bracketsStack []BracketStep, diagonal [32]int)) {
 	diagonal := [32]int{}
-	recursion(0, 0, []Point{}, maxChilds, diagonal, maxBracketPairs, ready)
+	recursion(0, 0, []BracketStep{}, maxChilds, diagonal, maxBracketPairs, ready)
 }
 
-func brackets2points(brackets string) (*[]Point, error) {
+func brackets2points(brackets string) ([]BracketStep, int, error) {
 	totalOpens := 0
 	totalCloses := 0
 
-	points := []Point{}
+	points := []BracketStep{}
 
 	for i := 0; i < len(brackets); {
 
@@ -62,7 +58,7 @@ func brackets2points(brackets string) (*[]Point, error) {
 		totalOpens = totalOpens + opens
 
 		if i < len(brackets) && brackets[i] != ')' {
-			return nil, fmt.Errorf("Unexpected Symbol %v <- Expecting '(' or ')'", brackets[:i+1])
+			return nil, 0, fmt.Errorf("Unexpected Symbol %v <- Expecting '(' or ')'", brackets[:i+1])
 		}
 
 		closes := 0
@@ -72,29 +68,109 @@ func brackets2points(brackets string) (*[]Point, error) {
 		totalCloses = totalCloses + closes
 
 		if i < len(brackets) && brackets[i] != '(' {
-			return nil, fmt.Errorf("Unexpected Symbol %v <- Expecting '(' or ')'", brackets[:i+1])
+			return nil, 0, fmt.Errorf("Unexpected Symbol %v <- Expecting '(' or ')'", brackets[:i+1])
 		}
 
-		points = append(points, Point{Opens: opens, Closes: closes})
+		points = append(points, BracketStep{Opens: opens, Closes: closes})
 
 		if totalOpens < totalCloses {
-			return nil, fmt.Errorf("%v <- total closes=%v are greater than opens=%v", brackets[:i], totalCloses, totalOpens)
+			return nil, 0, fmt.Errorf("%v <- total closes=%v are greater than opens=%v", brackets[:i], totalCloses, totalOpens)
 		}
 	}
 
 	if totalOpens != totalCloses {
-		return nil, fmt.Errorf("opened brackets=%v closed brackets=%v should be equal", totalOpens, totalCloses)
+		return nil, 0, fmt.Errorf("opened brackets=%v closed brackets=%v should be equal", totalOpens, totalCloses)
 	}
 
-	return &points, nil
+	return points, (totalOpens + totalCloses) / 2, nil
+}
+
+/*
+func calculateDiagonal(bracketSteps []BracketStep) [32]int {
+	diagonal := [32]int{}
+	_x := 0
+	_y := 0
+
+	for _, step := range bracketSteps {
+
+	}
+
+	return diagonal
+}
+*/
+func recursionNext(srcBracketsStack []BracketStep, dstBracketsStack []BracketStep, _x int, _y int, maxBracketPairs int, maxChilds int, diagonal [32]int, currentRecursionStep int, previousSolutionAlreadyReached bool) ([]BracketStep, bool, bool) {
+	if _x == maxBracketPairs && _y == maxBracketPairs {
+		if !previousSolutionAlreadyReached && len(srcBracketsStack) > 0 {
+			return []BracketStep{}, true, false
+		}
+		return dstBracketsStack, true, true
+	}
+
+	if diagonal[_x-_y] < maxChilds {
+		for x := _x + 1; x <= maxBracketPairs; x++ {
+			diagonal[x-_y-1] = diagonal[x-_y-1] + 1
+
+			if previousSolutionAlreadyReached || len(srcBracketsStack) == 0 || (x-_x) >= srcBracketsStack[currentRecursionStep].Opens {
+
+				for y := _y + 1; y <= maxBracketPairs; y++ {
+
+					if previousSolutionAlreadyReached || len(srcBracketsStack) == 0 || (y-_y) >= srcBracketsStack[currentRecursionStep].Closes {
+
+						if y <= x {
+							if diagonal[x-y] < maxChilds+1 {
+
+								newBracketsStack := append(dstBracketsStack, BracketStep{Opens: x - _x, Closes: y - _y})
+								tail, reached, solutionFound := recursionNext(srcBracketsStack, newBracketsStack, x, y, maxBracketPairs, maxChilds, diagonal, currentRecursionStep+1, previousSolutionAlreadyReached)
+
+								previousSolutionAlreadyReached = reached
+
+								if solutionFound {
+									return tail, previousSolutionAlreadyReached, solutionFound
+								}
+
+							}
+						}
+					}
+				}
+
+			}
+
+		}
+	}
+
+	return []BracketStep{}, previousSolutionAlreadyReached, false
 }
 
 // GetNextTree get current brackets representation of tree and return next one tree in brackets representation
 func GetNextTree(brackets string) (string, error) {
-	points, err := brackets2points(brackets)
+
+	bracketsStack, maxBracketPairs, err := brackets2points(brackets)
 	if err != nil {
 		return "", err
 	}
 
-	return fmt.Sprintf("%v", points), nil
+	diagonal := [32]int{}
+
+	if len(bracketsStack) == 1 {
+		bracketsStack = []BracketStep{}
+		maxBracketPairs++
+	}
+
+	nextBracketCombination, _, _ := recursionNext(bracketsStack, []BracketStep{}, 0, 0, maxBracketPairs, 2, diagonal, 0, false)
+
+	return BracketsStepsToString(nextBracketCombination), nil
+}
+
+// BracketsStepsToString serialize bracketSteps to String
+func BracketsStepsToString(tail []BracketStep) string {
+	output := ""
+	for _, step := range tail {
+		for i := 0; i < step.Opens; i++ {
+			output += fmt.Sprintf("(")
+		}
+		for i := 0; i < step.Closes; i++ {
+			output += fmt.Sprintf(")")
+		}
+	}
+	return output
 }
