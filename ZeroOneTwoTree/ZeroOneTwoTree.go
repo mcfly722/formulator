@@ -127,8 +127,8 @@ func recursionNext(srcBracketsStack []BracketStep, dstBracketsStack []BracketSte
 	return []BracketStep{}, previousSolutionAlreadyReached, false
 }
 
-// GetNextTree get current brackets representation of tree and return next one tree in brackets representation
-func GetNextTree(brackets string, maxChilds int) (string, error) {
+// GetNextBracketsSequence get current brackets representation of tree and return next one tree in brackets representation
+func GetNextBracketsSequence(brackets string, maxChilds int) (string, error) {
 
 	bracketsStack, maxBracketPairs, err := brackets2points(brackets)
 	if err != nil {

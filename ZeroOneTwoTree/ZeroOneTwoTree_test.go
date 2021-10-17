@@ -29,7 +29,7 @@ func Test_Recombines(t *testing.T) {
 }
 
 func testBracketsForError(t *testing.T, brackets string) {
-	_, err := GetNextTree(brackets, 2)
+	_, err := GetNextBracketsSequence(brackets, 2)
 	if err != nil {
 		t.Log(fmt.Sprintf("correct error handling for %v -> %v", brackets, err))
 	} else {
@@ -128,25 +128,45 @@ func Test_BracketsToTree_FirstBracket(t *testing.T) {
 	testBracketsToTreeSuccess(t, "()")
 }
 
-func Test_GetNextTree(t *testing.T) {
+func Test_IterateOverPossibleTrees(t *testing.T) {
 	bracketSequence := "()"
 
-	for i := 1; i < 200; i++ {
+	for i := 1; i < 60; i++ {
 
 		tree, err := BracketsToTree(bracketSequence)
 		if err != nil {
-			t.Errorf("GetNextTree('%v') returned error:%v", bracketSequence, err)
+			t.Errorf("BracketsToTree ('%v') returned error: %v", bracketSequence, err)
 		}
 
 		max := tree.MaxChilds()
 
-		nextBracketSequcence, err := GetNextTree(bracketSequence, 1000)
+		nextBracketSequcence, err := GetNextBracketsSequence(bracketSequence, 1000)
 		if err != nil {
-			t.Errorf("GetNextTree('%v') returned error:%v", bracketSequence, err)
+			t.Errorf("GetNextBracketsSequence ('%v') returned error: %v", bracketSequence, err)
 		}
 
-		t.Log(fmt.Sprintf("%3v) %3v %v -> %v", i, max, bracketSequence, nextBracketSequcence))
+		t.Log(fmt.Sprintf("%3v) %3v %10v -> %10v", i, max, bracketSequence, nextBracketSequcence))
 		bracketSequence = nextBracketSequcence
 	}
 
+}
+
+// go test -bench .
+
+func BenchmarkGetNextBracketsSequenceForTwo(b *testing.B) {
+	currentSequence := "()"
+	for n := 0; n < b.N; n++ {
+		next, _ := GetNextBracketsSequence(currentSequence, 2)
+		currentSequence = next
+	}
+}
+
+func BenchmarkBracketsToTree(b *testing.B) {
+	currentSequence := "()((())())((()((())())))"
+	for n := 0; n < b.N; n++ {
+		_, err := BracketsToTree(currentSequence)
+		if err != nil {
+			b.Errorf("error:%v", err)
+		}
+	}
 }
