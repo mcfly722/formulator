@@ -7,7 +7,6 @@ import (
 )
 
 func Test_Recombines(t *testing.T) {
-
 	i := 1
 
 	ready := func(bracketsStack []BracketStep, diagonal [32]int) {
@@ -128,10 +127,8 @@ func Test_BracketsToTree_FirstBracket(t *testing.T) {
 	testBracketsToTreeSuccess(t, "()")
 }
 
-func Test_IterateOverPossibleTrees(t *testing.T) {
-	bracketSequence := "()"
-
-	for i := 1; i < 60; i++ {
+func iterateOverTrees(t *testing.T, bracketSequence string, n int, maxChilds int) {
+	for i := 1; i < n; i++ {
 
 		tree, err := BracketsToTree(bracketSequence)
 		if err != nil {
@@ -140,15 +137,22 @@ func Test_IterateOverPossibleTrees(t *testing.T) {
 
 		max := tree.MaxChilds()
 
-		nextBracketSequcence, err := GetNextBracketsSequence(bracketSequence, 1000)
+		nextBracketSequcence, err := GetNextBracketsSequence(bracketSequence, maxChilds)
 		if err != nil {
 			t.Errorf("GetNextBracketsSequence ('%v') returned error: %v", bracketSequence, err)
 		}
 
-		t.Log(fmt.Sprintf("%3v) %3v %10v -> %10v", i, max, bracketSequence, nextBracketSequcence))
+		t.Log(fmt.Sprintf("%3v) %3v %v -> %v", i, max, bracketSequence, nextBracketSequcence))
 		bracketSequence = nextBracketSequcence
 	}
+}
 
+func Test_IterateOverPossibleTrees(t *testing.T) {
+	iterateOverTrees(t, "()", 60, 10000)
+}
+
+func Test_IterateOverZeroOneTwoTrees(t *testing.T) {
+	iterateOverTrees(t, "()", 60, 2)
 }
 
 // go test -bench .
