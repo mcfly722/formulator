@@ -6,7 +6,6 @@ import (
 
 // Node of tree
 type Node struct {
-	Parent *Node
 	Childs []*Node
 }
 
@@ -85,19 +84,6 @@ func brackets2points(brackets string) ([]BracketStep, int, error) {
 	return points, (totalOpens + totalCloses) / 2, nil
 }
 
-/*
-func calculateDiagonal(bracketSteps []BracketStep) [32]int {
-	diagonal := [32]int{}
-	_x := 0
-	_y := 0
-
-	for _, step := range bracketSteps {
-
-	}
-
-	return diagonal
-}
-*/
 func recursionNext(srcBracketsStack []BracketStep, dstBracketsStack []BracketStep, _x int, _y int, maxBracketPairs int, maxChilds int, diagonal [32]int, currentRecursionStep int, previousSolutionAlreadyReached bool) ([]BracketStep, bool, bool) {
 	if _x == maxBracketPairs && _y == maxBracketPairs {
 		if !previousSolutionAlreadyReached && len(srcBracketsStack) > 0 {
@@ -142,7 +128,7 @@ func recursionNext(srcBracketsStack []BracketStep, dstBracketsStack []BracketSte
 }
 
 // GetNextTree get current brackets representation of tree and return next one tree in brackets representation
-func GetNextTree(brackets string) (string, error) {
+func GetNextTree(brackets string, maxChilds int) (string, error) {
 
 	bracketsStack, maxBracketPairs, err := brackets2points(brackets)
 	if err != nil {
@@ -156,7 +142,7 @@ func GetNextTree(brackets string) (string, error) {
 		maxBracketPairs++
 	}
 
-	nextBracketCombination, _, _ := recursionNext(bracketsStack, []BracketStep{}, 0, 0, maxBracketPairs, 2, diagonal, 0, false)
+	nextBracketCombination, _, _ := recursionNext(bracketsStack, []BracketStep{}, 0, 0, maxBracketPairs, maxChilds, diagonal, 0, false)
 
 	return BracketsStepsToString(nextBracketCombination), nil
 }
@@ -173,4 +159,66 @@ func BracketsStepsToString(tail []BracketStep) string {
 		}
 	}
 	return output
+}
+
+// BracketsToTree generates expression tree based on string of brackets
+func BracketsToTree(input string) (*Node, error) {
+	root := Node{Childs: []*Node{}}
+
+	if input == "" {
+		return &root, nil
+	}
+
+	counter := 0
+	from := 0
+
+	for i := 0; i < len(input); i++ {
+
+		if input[i] == '(' {
+			if counter == 0 {
+				from = i
+			}
+			counter++
+		}
+
+		if input[i] == ')' {
+			counter--
+
+			if counter < 0 {
+				return nil, fmt.Errorf("%v<- incorrect brackets balance, could not close not opened bracket", input[0:i+1])
+			}
+
+			if counter == 0 {
+				argument, _ := BracketsToTree(input[from+1 : i])
+				if argument != nil {
+					root.Childs = append(root.Childs, argument)
+				}
+			}
+
+		}
+
+		if input[i] != '(' && input[i] != ')' {
+			return nil, fmt.Errorf("%v<- unknown symbol", input[0:i+1])
+		}
+	}
+
+	if counter != 0 {
+		return nil, fmt.Errorf("number of opened brackets are not equal to closed (difference=%v)", counter)
+	}
+
+	return &root, nil
+}
+
+// MaxChilds get maximum childs for tree
+func (treeRoot *Node) MaxChilds() int {
+	max := len(treeRoot.Childs)
+
+	for _, child := range treeRoot.Childs {
+		m := child.MaxChilds()
+		if m > max {
+			max = m
+		}
+	}
+
+	return max
 }
