@@ -11,13 +11,14 @@ import (
 func Test_FunctionsRound(t *testing.T) {
 	argument := rand.Float64()*100 - 50
 
-	f := newFunction(func(a float64) float64 {
-		return math.Round(a)
-	}, "round")
+	round, err := FunctionByName("round")
+	if err != nil {
+		t.Errorf(fmt.Sprintf("%v", err))
+	}
 
-	c := f.Calculate(argument)
+	c := round.Calculate(argument)
 
-	expression := fmt.Sprintf("%v = %v", f.FunctionExpressionToString(fmt.Sprintf("%f", argument)), c)
+	expression := fmt.Sprintf("%v = %v", round.FunctionExpressionToString(fmt.Sprintf("%f", argument)), c)
 
 	if c != math.Round(argument) {
 		t.Errorf(expression)
@@ -28,21 +29,6 @@ func Test_FunctionsRound(t *testing.T) {
 }
 
 func Test_FunctionsRecombination(t *testing.T) {
-
-	roundFunction := newFunction(func(a float64) float64 { return math.Round(a) }, "round")
-
-	// returns 0 = 0, if odd = 1, even = -1
-	oddFunction := newFunction(func(a float64) float64 {
-		if int64(a)%2 == 1 {
-			return 1
-		}
-		if a == 0 {
-			return 0
-		}
-		return -1
-	}, "  odd")
-
-	availableFunctionsTypes := []*Function{roundFunction, oddFunction}
 
 	combination := []*Function{nil, nil, nil, nil, nil}
 
@@ -58,5 +44,5 @@ func Test_FunctionsRecombination(t *testing.T) {
 		i++
 	}
 
-	Recombination(availableFunctionsTypes, combination, ready)
+	Recombination(Functions, combination, ready)
 }

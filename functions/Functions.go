@@ -1,24 +1,53 @@
 package functions
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 // Function structure
 type Function struct {
-	calculator func(a float64) float64
-	Name       string
+	Name     string
+	Function func(a float64) float64
 }
 
-// Constructor
-func newFunction(_calculator func(a float64) float64, _name string) *Function {
-	return &Function{
-		calculator: _calculator,
-		Name:       _name,
+// Functions all known functions
+var Functions = []*Function{
+	{
+		Name:     "round",
+		Function: func(a float64) float64 { return math.Round(a) },
+	},
+	{
+		Name: "odd",
+		Function: func(a float64) float64 {
+			if int64(a)%2 == 1 {
+				return 1
+			}
+			if a == 0 {
+				return 0
+			}
+			return -1
+		},
+	},
+	{
+		Name:     "abs",
+		Function: func(a float64) float64 { return math.Abs(a) },
+	},
+}
+
+// FunctionByName get function by its name
+func FunctionByName(name string) (*Function, error) {
+	for n := range Functions {
+		if Functions[n].Name == name {
+			return Functions[n], nil
+		}
 	}
+	return nil, fmt.Errorf(fmt.Sprintf("function %v is unknown", name))
 }
 
 // Calculate function
 func (function Function) Calculate(argument float64) float64 {
-	return function.calculator(argument)
+	return function.Function(argument)
 }
 
 // FunctionExpressionToString string representation of function
