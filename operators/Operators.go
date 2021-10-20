@@ -2,30 +2,49 @@ package operators
 
 import (
 	"fmt"
+	"math"
 )
 
 // Operator structure
 type Operator struct {
-	f         func(a float64, b float64) float64
-	Separator string
+	Function func(a float64, b float64) float64
+	Name     string
 }
 
-// Constructor
-func newOperator(calculator func(a float64, b float64) float64, _separator string) *Operator {
-	return &Operator{
-		f:         calculator,
-		Separator: _separator,
+// Operators all known operators
+var Operators = []*Operator{
+	{
+		Name:     "+",
+		Function: func(a float64, b float64) float64 { return a + b },
+	},
+	{
+		Name:     "*",
+		Function: func(a float64, b float64) float64 { return a * b },
+	},
+	{
+		Name:     "^",
+		Function: func(a float64, b float64) float64 { return math.Pow(a, b) },
+	},
+}
+
+// OperatorByName get operator by its name
+func OperatorByName(name string) (*Operator, error) {
+	for n := range Operators {
+		if Operators[n].Name == name {
+			return Operators[n], nil
+		}
 	}
+	return nil, fmt.Errorf(fmt.Sprintf("operator %v is unknown", name))
 }
 
 // Calculate function
 func (o Operator) Calculate(a float64, b float64) float64 {
-	return o.f(a, b)
+	return o.Function(a, b)
 }
 
 // OperatorExpressionToString string representation of operator
 func (o Operator) OperatorExpressionToString(a string, b string) string {
-	return fmt.Sprintf("%v %v %v", a, o.Separator, b)
+	return fmt.Sprintf("%v %v %v", a, o.Name, b)
 }
 
 func recombine(availableOperators []*Operator, combination []*Operator, position int, ready func()) {
