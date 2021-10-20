@@ -10,8 +10,6 @@ import (
 func Test_ConstantsCombinations(t *testing.T) {
 	i := 1
 
-	availableConstants := []float64{3, IterationIndex, PreviousIterationValue, Argument}
-
 	combination := []float64{0, 0, 0}
 
 	ready := func(constantsCombination *[]float64) {
@@ -19,5 +17,5 @@ func Test_ConstantsCombinations(t *testing.T) {
 		i++
 	}
 
-	Recombination(&availableConstants, &combination, 1, 2, 3, true, ready)
+	Recombination(&AvailableConstants, &combination, 1, 2, 3, true, ready)
 }

@@ -14,6 +14,9 @@ const PreviousIterationValue = 2147483648 + 2
 // Argument constant
 const Argument = 2147483648 + 3
 
+// AvailableConstants all available constants
+var AvailableConstants = []float64{3, IterationIndex, PreviousIterationValue, Argument}
+
 func nextCombinationDigit(
 	availableConstants *[]float64,
 	combination []float64,
