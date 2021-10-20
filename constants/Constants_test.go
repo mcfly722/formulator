@@ -10,12 +10,16 @@ import (
 func Test_ConstantsCombinations(t *testing.T) {
 	i := 1
 
-	constants := []float64{3, constantIterationIndex, constantPreviousIterationValue, constantArgument}
+	availableConstants := []float64{3, IterationIndex, PreviousIterationValue, Argument}
 
-	ready := func(constantsCombination []float64) {
-		t.Log(fmt.Sprintf("%3v) %v", i, CombinationToString(constantsCombination, " ")))
+	combination := []float64{0, 0, 0}
+
+	combinationPointer := []*float64{&combination[0], &combination[1], &combination[2]}
+
+	ready := func(constantsCombination *[]*float64) {
+		t.Log(fmt.Sprintf("%3v) %v", i, CombinationToString(&combination, " ")))
 		i++
 	}
 
-	Recombination(&constants, 3, 1, 2, 3, true, ready)
+	Recombination(&availableConstants, &combinationPointer, 1, 2, 3, true, ready)
 }
