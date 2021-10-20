@@ -22,8 +22,8 @@ func nextCombinationDigit(
 	maxPreviousIterationValue int,
 	maxArguments int,
 	previousIterationRequired bool,
-	constantsCombination *[]*float64,
-	ready func(constantsCombination *[]*float64)) {
+	constantsCombination *[]float64,
+	ready func(constantsCombination *[]float64)) {
 
 	if len(combination) < depth {
 		for i := 0; i < len(*availableConstants); i++ {
@@ -63,7 +63,7 @@ func nextCombinationDigit(
 	} else {
 		if !previousIterationRequired || contains(combination, PreviousIterationValue) {
 			for i, c := range combination {
-				*(*constantsCombination)[i] = c
+				(*constantsCombination)[i] = c
 			}
 			ready(constantsCombination)
 		}
@@ -82,12 +82,12 @@ func contains(s []float64, e float64) bool {
 // Recombination recombine all constants and call ready function for each combination
 func Recombination(
 	availableConstants *[]float64,
-	constantsCombination *[]*float64,
+	constantsCombination *[]float64,
 	maxIterationIndexes int,
 	maxPreviousIterationValue int,
 	maxArguments int,
 	previousIterationRequired bool,
-	ready func(constantsCombination *[]*float64)) {
+	ready func(constantsCombination *[]float64)) {
 
 	combination := []float64{}
 
