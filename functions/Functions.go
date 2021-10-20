@@ -3,6 +3,7 @@ package functions
 import (
 	"fmt"
 	"math"
+	"math/big"
 )
 
 // Function structure
@@ -15,15 +16,15 @@ type Function struct {
 var Functions = []*Function{
 	{
 		Name:     "round",
-		Function: func(a float64) float64 { return math.Round(a) },
+		Function: func(x float64) float64 { return math.Round(x) },
 	},
 	{
 		Name: "odd",
-		Function: func(a float64) float64 {
-			if int64(a)%2 == 1 {
+		Function: func(x float64) float64 {
+			if int64(x)%2 == 1 {
 				return 1
 			}
-			if a == 0 {
+			if x == 0 {
 				return 0
 			}
 			return -1
@@ -31,7 +32,19 @@ var Functions = []*Function{
 	},
 	{
 		Name:     "abs",
-		Function: func(a float64) float64 { return math.Abs(a) },
+		Function: func(x float64) float64 { return math.Abs(x) },
+	},
+	{
+		Name: "fact",
+		Function: func(x float64) float64 {
+			if x != float64(uint64(x)) {
+				panic("Factorial input must be a positive integer.")
+			}
+			var res *big.Int = new(big.Int)
+			res.MulRange(1, int64(x))
+
+			return float64(res.Int64())
+		},
 	},
 }
 
