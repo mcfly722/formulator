@@ -25,8 +25,8 @@ func nextCombinationDigit(
 	maxPreviousIterationValue int,
 	maxArguments int,
 	previousIterationRequired bool,
-	constantsCombination *[]float64,
-	ready func(constantsCombination *[]float64)) {
+	constantsCombination *[]*float64,
+	ready func(constantsCombination *[]*float64)) {
 
 	if len(combination) < depth {
 		for i := 0; i < len(*availableConstants); i++ {
@@ -65,8 +65,9 @@ func nextCombinationDigit(
 		}
 	} else {
 		if !previousIterationRequired || contains(combination, PreviousIterationValue) {
+
 			for i, c := range combination {
-				(*constantsCombination)[i] = c
+				*((*constantsCombination)[i]) = c
 			}
 			ready(constantsCombination)
 		}
@@ -85,12 +86,12 @@ func contains(s []float64, e float64) bool {
 // Recombination recombine all constants and call ready function for each combination
 func Recombination(
 	availableConstants *[]float64,
-	constantsCombination *[]float64,
+	constantsCombination *[]*float64,
 	maxIterationIndexes int,
 	maxPreviousIterationValue int,
 	maxArguments int,
 	previousIterationRequired bool,
-	ready func(constantsCombination *[]float64)) {
+	ready func(constantsCombination *[]*float64)) {
 
 	combination := []float64{}
 
@@ -117,15 +118,15 @@ func ToString(constant float64) string {
 	case Argument:
 		return "    x"
 	default:
-		return fmt.Sprintf("%5v", constant)
+		return fmt.Sprintf("%v", constant)
 	}
 }
 
 // CombinationToString converts combination of constants to string
 func CombinationToString(combination *[]float64, separator string) string {
 	out := []string{}
-	for _, v := range *combination {
-		out = append(out, ToString(v))
+	for _, constant := range *combination {
+		out = append(out, ToString(constant))
 	}
 
 	return strings.Join(out, separator)
