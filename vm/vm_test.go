@@ -42,18 +42,30 @@ func recombineSequence(sequence string, availableConstants *[]float64, available
 
 	i := 1
 
-	ready := func(constantsCombination *[]float64) {
-		fmt.Println(fmt.Sprintf("%3v) %v", i, constants.CombinationToString(program.Constants, " ")))
-		i++
+	readyConstants := func(constantsCombination *[]float64) {
+
+		if len(program.Operators) > 0 {
+
+			readyOperators := func(operatorsCombination []*operators.Operator) {
+
+				fmt.Println(fmt.Sprintf("%3v) %v          %v", i, constants.CombinationToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " ")))
+
+				i++
+			}
+
+			operators.Recombination(availableOperators, program.Operators, readyOperators)
+			fmt.Println("")
+		}
+
 	}
 
-	constants.Recombination(availableConstants, program.Constants, 1, 2, 3, true, ready)
+	constants.Recombination(availableConstants, &program.Constants, 1, 2, 3, true, readyConstants)
 
 	return nil
 }
 
 func Test_CompilationRecombination(t *testing.T) {
-	sequence := "()((()))"
+	sequence := "()((()()))"
 
 	err := recombineSequence(sequence, &constants.AvailableConstants, functions.Functions, operators.Operators)
 	if err != nil {

@@ -56,7 +56,7 @@ func Test_OperatorsRecombination(t *testing.T) {
 
 	i := 1
 
-	ready := func() {
+	ready := func(combination []*Operator) {
 		operators := []string{}
 		for _, operator := range combination {
 			operators = append(operators, operator.Name)
