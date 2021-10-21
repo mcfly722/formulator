@@ -9,10 +9,12 @@ import (
 	"github.com/mcfly722/formulator/operators"
 )
 
+const testBracketSequence = "(())((()()))"
+
 // go test -v constants.go constants_test.go
 
 func Test_Compilation(t *testing.T) {
-	sequence := "(())((()()))"
+	sequence := testBracketSequence
 
 	program, err := Compile(sequence)
 	if err != nil {
@@ -48,9 +50,15 @@ func recombineSequence(sequence string, availableConstants *[]float64, available
 
 			readyOperators := func(operatorsCombination []*operators.Operator) {
 
-				fmt.Println(fmt.Sprintf("%3v) %v          %v", i, constants.CombinationToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " ")))
+				if len(program.Functions) > 0 {
+					readyFunctions := func(functionsCombination []*functions.Function) {
+						fmt.Println(fmt.Sprintf("%3v) %v          %v     %v", i, constants.CombinationToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " "), functions.CombinationToString(&program.Functions, " ")))
+						i++
+					}
 
-				i++
+					functions.Recombination(availableFunctions, program.Functions, readyFunctions)
+					fmt.Println("")
+				}
 			}
 
 			operators.Recombination(availableOperators, program.Operators, readyOperators)
@@ -65,9 +73,7 @@ func recombineSequence(sequence string, availableConstants *[]float64, available
 }
 
 func Test_CompilationRecombination(t *testing.T) {
-	sequence := "()((()()))"
-
-	err := recombineSequence(sequence, &constants.AvailableConstants, functions.Functions, operators.Operators)
+	err := recombineSequence(testBracketSequence, &constants.AvailableConstants, functions.Functions, operators.Operators)
 	if err != nil {
 		t.Errorf("%v", err)
 	}

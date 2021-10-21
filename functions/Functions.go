@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"strings"
 )
 
 // Function structure
@@ -68,18 +69,28 @@ func (function Function) FunctionExpressionToString(argument string) string {
 	return fmt.Sprintf("%v(%v)", function.Name, argument)
 }
 
-func recombine(availableFunctions []*Function, combination []*Function, position int, ready func()) {
+func recombine(availableFunctions []*Function, combination []*Function, position int, ready func(functionsCombination []*Function)) {
 	if position < len(combination) {
 		for _, function := range availableFunctions {
 			(combination)[position] = function
 			recombine(availableFunctions, combination, position+1, ready)
 		}
 	} else {
-		ready()
+		ready(combination)
 	}
 }
 
 // Recombination for functions
-func Recombination(availableFunctions []*Function, combination []*Function, ready func()) {
+func Recombination(availableFunctions []*Function, combination []*Function, ready func(functionsCombination []*Function)) {
 	recombine(availableFunctions, combination, 0, ready)
+}
+
+// CombinationToString string representation
+func CombinationToString(combination *[]*Function, separator string) string {
+	out := []string{}
+	for _, function := range *combination {
+		out = append(out, fmt.Sprintf("%5v", function.Name))
+	}
+
+	return strings.Join(out, separator)
 }

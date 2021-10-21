@@ -33,7 +33,7 @@ func Test_FunctionsRecombination(t *testing.T) {
 	combination := []*Function{nil, nil, nil, nil, nil}
 
 	i := 1
-	ready := func() {
+	ready := func(_ []*Function) {
 
 		functions := []string{}
 		for _, function := range combination {
