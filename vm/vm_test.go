@@ -2,6 +2,7 @@ package vm
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/mcfly722/formulator/constants"
@@ -15,16 +16,14 @@ const testBracketSequence = "(())((()()))"
 
 func Test_Compilation(t *testing.T) {
 	sequence := testBracketSequence
-
 	program, err := Compile(sequence)
 	if err != nil {
 		t.Errorf("Compilation ('%v') returned error: %v", sequence, err)
 	}
-
 	t.Log(fmt.Sprintf("%v", program.ToString()))
-
 }
 
+/*
 func Test_CompilationError1(t *testing.T) {
 	sequence := "(()()()!)"
 	_, err := Compile(sequence)
@@ -33,6 +32,17 @@ func Test_CompilationError1(t *testing.T) {
 	} else {
 		t.Errorf("Incorrect compilation for %v", sequence)
 	}
+}
+*/
+
+func Test_Decompilation(t *testing.T) {
+	sequence := testBracketSequence
+	program, err := Compile(sequence)
+	if err != nil {
+		t.Errorf("Compilation ('%v') returned error: %v", sequence, err)
+	}
+
+	t.Log(fmt.Sprintf("decompiled to: %v", Decompile(program)))
 }
 
 func recombineSequence(sequence string, availableConstants *[]float64, availableFunctions []*functions.Function, availableOperators []*operators.Operator) error {
@@ -44,7 +54,7 @@ func recombineSequence(sequence string, availableConstants *[]float64, available
 
 	i := 1
 
-	readyConstants := func(constantsCombination *[]float64) {
+	readyConstants := func(constantsCombination *[]*float64) {
 
 		if len(program.Operators) > 0 {
 
@@ -52,8 +62,11 @@ func recombineSequence(sequence string, availableConstants *[]float64, available
 
 				if len(program.Functions) > 0 {
 					readyFunctions := func(functionsCombination []*functions.Function) {
-						fmt.Println(fmt.Sprintf("%3v) %v          %v     %v", i, constants.CombinationToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " "), functions.CombinationToString(&program.Functions, " ")))
+						fmt.Println(fmt.Sprintf("%3v) %v          %v     %v     %v", i, constants.CombinationOfPointersToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " "), functions.CombinationToString(&program.Functions, " "), Decompile(program)))
 						i++
+						if i > 3 {
+							os.Exit(0)
+						}
 					}
 
 					functions.Recombination(availableFunctions, program.Functions, readyFunctions)
