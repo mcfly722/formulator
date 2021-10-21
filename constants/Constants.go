@@ -128,6 +128,14 @@ func CombinationToString(combination *[]float64, separator string) string {
 	for _, constant := range *combination {
 		out = append(out, ToString(constant))
 	}
+	return strings.Join(out, separator)
+}
 
+// CombinationOfPointersToString converts combination of constants to string
+func CombinationOfPointersToString(combination *[]*float64, separator string) string {
+	out := []string{}
+	for _, constant := range *combination {
+		out = append(out, ToString(*constant))
+	}
 	return strings.Join(out, separator)
 }
