@@ -112,11 +112,11 @@ func Recombination(
 func ToString(constant float64) string {
 	switch constant {
 	case IterationIndex:
-		return "    n"
+		return "n"
 	case PreviousIterationValue:
 		return "prevX"
 	case Argument:
-		return "    x"
+		return "x"
 	default:
 		return fmt.Sprintf("%v", constant)
 	}

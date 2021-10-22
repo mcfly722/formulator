@@ -64,7 +64,7 @@ func recombineSequence(sequence string, availableConstants *[]float64, available
 					readyFunctions := func(functionsCombination []*functions.Function) {
 						fmt.Println(fmt.Sprintf("%3v) %v          %v     %v     %v", i, constants.CombinationOfPointersToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " "), functions.CombinationToString(&program.Functions, " "), Decompile(program)))
 						i++
-						if i > 3 {
+						if i > 3000 {
 							os.Exit(0)
 						}
 					}
