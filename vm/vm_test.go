@@ -10,7 +10,7 @@ import (
 	"github.com/mcfly722/formulator/operators"
 )
 
-const testBracketSequence = "(())((()()))"
+const testBracketSequence = "((()()))()"
 
 // go test -v constants.go constants_test.go
 
