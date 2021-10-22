@@ -2,6 +2,7 @@ package vm
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/mcfly722/formulator/constants"
@@ -148,4 +149,48 @@ func Compile(bracketsSequence string) (*Program, error) {
 func (program *Program) ToString() string {
 	astJSON, _ := json.MarshalIndent(program.ASTTree, "", "  ")
 	return fmt.Sprintf("program\nsequence:%v\nconstants:%v\nfunctions:%v\noperators:%v\ninstructions:%v\nASTTree:\n%v", program.BracketSequence, len(program.Constants), len(program.Functions), len(program.Operators), len(program.Instructions), string(astJSON))
+}
+
+// RecombineSequence function
+func RecombineSequence(sequence string, availableConstants *[]float64, availableFunctions []*functions.Function, availableOperators []*operators.Operator, readyProgram func(program *Program)) error {
+
+	program, err := Compile(sequence)
+	if err != nil {
+		return err
+	}
+
+	readyConstants := func(constantsCombination *[]*float64) {
+
+		readyFunctions := func(functionsCombination []*functions.Function) {
+			readyProgram(program)
+		}
+
+		readyOperators := func(operatorsCombination []*operators.Operator) {
+			if len(program.Functions) > 0 {
+				functions.Recombination(availableFunctions, program.Functions, readyFunctions)
+			} else {
+				readyProgram(program)
+			}
+		}
+
+		if len(program.Operators) > 0 {
+			operators.Recombination(availableOperators, program.Operators, readyOperators)
+		} else {
+
+			if len(program.Functions) > 0 {
+				functions.Recombination(availableFunctions, program.Functions, readyFunctions)
+			} else {
+				readyProgram(program)
+			}
+
+		}
+	}
+
+	if len(program.Constants) > 0 {
+		constants.Recombination(availableConstants, &program.Constants, 1, 2, 3, true, readyConstants)
+	} else {
+		return errors.New("there are no constants to iterate")
+	}
+
+	return nil
 }

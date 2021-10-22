@@ -23,7 +23,6 @@ func Test_Compilation(t *testing.T) {
 	t.Log(fmt.Sprintf("%v", program.ToString()))
 }
 
-/*
 func Test_CompilationError1(t *testing.T) {
 	sequence := "(()()()!)"
 	_, err := Compile(sequence)
@@ -33,7 +32,6 @@ func Test_CompilationError1(t *testing.T) {
 		t.Errorf("Incorrect compilation for %v", sequence)
 	}
 }
-*/
 
 func Test_Decompilation(t *testing.T) {
 	sequence := testBracketSequence
@@ -45,48 +43,18 @@ func Test_Decompilation(t *testing.T) {
 	t.Log(fmt.Sprintf("decompiled to: %v", Decompile(program)))
 }
 
-func recombineSequence(sequence string, availableConstants *[]float64, availableFunctions []*functions.Function, availableOperators []*operators.Operator) error {
-
-	program, err := Compile(sequence)
-	if err != nil {
-		return err
-	}
-
+func Test_CompilationRecombination(t *testing.T) {
 	i := 1
 
-	readyConstants := func(constantsCombination *[]*float64) {
-
-		if len(program.Operators) > 0 {
-
-			readyOperators := func(operatorsCombination []*operators.Operator) {
-
-				if len(program.Functions) > 0 {
-					readyFunctions := func(functionsCombination []*functions.Function) {
-						fmt.Println(fmt.Sprintf("%3v) %v          %v     %v     %v", i, constants.CombinationOfPointersToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " "), functions.CombinationToString(&program.Functions, " "), Decompile(program)))
-						i++
-						if i > 3000 {
-							os.Exit(0)
-						}
-					}
-
-					functions.Recombination(availableFunctions, program.Functions, readyFunctions)
-					fmt.Println("")
-				}
-			}
-
-			operators.Recombination(availableOperators, program.Operators, readyOperators)
-			fmt.Println("")
+	readyProgram := func(program *Program) {
+		fmt.Println(fmt.Sprintf("%3v) %v          %v     %v     %v", i, constants.CombinationOfPointersToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " "), functions.CombinationToString(&program.Functions, " "), Decompile(program)))
+		i++
+		if i > 3000 {
+			os.Exit(0)
 		}
-
 	}
 
-	constants.Recombination(availableConstants, &program.Constants, 1, 2, 3, true, readyConstants)
-
-	return nil
-}
-
-func Test_CompilationRecombination(t *testing.T) {
-	err := recombineSequence(testBracketSequence, &constants.AvailableConstants, functions.Functions, operators.Operators)
+	err := RecombineSequence(testBracketSequence, &constants.AvailableConstants, functions.Functions, operators.Operators, readyProgram)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
