@@ -8,15 +8,15 @@ import (
 // IterationIndex constant
 const IterationIndex = 2147483648 + 1
 
-// PreviousIterationValue constant
-const PreviousIterationValue = 2147483648 + 2
+// PreviousValue constant. Equal to argument if there are no arguments in furmula, else starts from 0
+const PreviousValue = 2147483648 + 2
 
 // Argument constant
 const Argument = 2147483648 + 3
 
 // AvailableConstants all available constants
 //var AvailableConstants = []float64{3, IterationIndex, PreviousIterationValue, Argument}
-var AvailableConstants = []float64{1, 2, 3, PreviousIterationValue}
+var AvailableConstants = []float64{1, 2, 3, PreviousValue}
 
 func nextCombinationDigit(
 	availableConstants *[]float64,
@@ -42,7 +42,7 @@ func nextCombinationDigit(
 				currentIterationIndexes--
 			}
 
-			if v == PreviousIterationValue {
+			if v == PreviousValue {
 				currentPreviousIterationValue--
 			}
 
@@ -65,7 +65,7 @@ func nextCombinationDigit(
 			}
 		}
 	} else {
-		if !previousIterationRequired || contains(combination, PreviousIterationValue) {
+		if !previousIterationRequired || contains(combination, PreviousValue) {
 
 			for i, c := range combination {
 				*((*constantsCombination)[i]) = c
@@ -114,8 +114,8 @@ func ToString(constant float64) string {
 	switch constant {
 	case IterationIndex:
 		return "n"
-	case PreviousIterationValue:
-		return "prevX"
+	case PreviousValue:
+		return "pv"
 	case Argument:
 		return "x"
 	default:
