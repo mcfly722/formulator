@@ -161,8 +161,32 @@ func BracketsStepsToString(tail []BracketStep) string {
 	return output
 }
 
+func findMoreThanOneChilds(node *Node) int {
+	if len(node.Childs) > 1 {
+		return len(node.Childs)
+	}
+	if len(node.Childs) == 0 {
+		return 0
+	}
+	return findMoreThanOneChilds(node.Childs[0])
+}
+
 // BracketsToTree generates expression tree based on string of brackets
 func BracketsToTree(input string) (*Node, error) {
+	root, err := bracketsToTree(input)
+	if err != nil {
+		return nil, err
+	}
+	if findMoreThanOneChilds(root) < 2 {
+		//fmt.Println(fmt.Sprintf("polynom:%v", input))
+		return root.Childs[0], nil
+	}
+
+	//fmt.Println(fmt.Sprintf("not polynom:%v", input))
+	return root, nil
+}
+
+func bracketsToTree(input string) (*Node, error) {
 	root := Node{Childs: []*Node{}}
 
 	if input == "" {
@@ -189,7 +213,7 @@ func BracketsToTree(input string) (*Node, error) {
 			}
 
 			if counter == 0 {
-				argument, _ := BracketsToTree(input[from+1 : i])
+				argument, _ := bracketsToTree(input[from+1 : i])
 				if argument != nil {
 					root.Childs = append(root.Childs, argument)
 				}

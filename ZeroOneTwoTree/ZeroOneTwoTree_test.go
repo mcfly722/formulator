@@ -155,6 +155,39 @@ func Test_IterateOverZeroOneTwoTrees(t *testing.T) {
 	iterateOverTrees(t, "()", 60, 2)
 }
 
+func testBracketsToTree(t *testing.T, bracketsSequence string) {
+	astTree, err := BracketsToTree(bracketsSequence)
+	if err != nil {
+		t.Errorf("BracketsToTree ('%v') returned error: %v", bracketsSequence, err)
+	}
+
+	astJSON, _ := json.MarshalIndent(astTree, "", "  ")
+	t.Log(fmt.Sprintf("sequence:%v\n%v", bracketsSequence, string(astJSON)))
+
+}
+
+func Test_BracketsToTree1(t *testing.T) {
+	testBracketsToTree(t, "()")
+}
+func Test_BracketsToTree2(t *testing.T) {
+	testBracketsToTree(t, "(())")
+}
+func Test_BracketsToTree3(t *testing.T) {
+	testBracketsToTree(t, "((()))")
+}
+func Test_BracketsToTree4(t *testing.T) {
+	testBracketsToTree(t, "()()")
+}
+func Test_BracketsToTree5(t *testing.T) {
+	testBracketsToTree(t, "()()()")
+}
+func Test_BracketsToTree6(t *testing.T) {
+	testBracketsToTree(t, "(())()")
+}
+func Test_BracketsToTree7(t *testing.T) {
+	testBracketsToTree(t, "(())(())")
+}
+
 // go test -bench .
 
 func BenchmarkGetNextBracketsSequenceForTwo(b *testing.B) {
