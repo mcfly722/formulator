@@ -2,12 +2,7 @@ package vm
 
 import (
 	"fmt"
-	"os"
 	"testing"
-
-	"github.com/mcfly722/formulator/constants"
-	"github.com/mcfly722/formulator/functions"
-	"github.com/mcfly722/formulator/operators"
 )
 
 const testBracketSequence = "((()()))()"
@@ -41,21 +36,4 @@ func Test_Decompilation(t *testing.T) {
 	}
 
 	t.Log(fmt.Sprintf("decompiled to: %v", Decompile(program)))
-}
-
-func Test_CompilationRecombination(t *testing.T) {
-	i := 1
-
-	readyProgram := func(program *Program) {
-		fmt.Println(fmt.Sprintf("%3v) %v          %v     %v     %v", i, constants.CombinationOfPointersToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " "), functions.CombinationToString(&program.Functions, " "), Decompile(program)))
-		i++
-		if i > 3000 {
-			os.Exit(0)
-		}
-	}
-
-	err := RecombineSequence(testBracketSequence, &constants.AvailableConstants, functions.Functions, operators.Operators, readyProgram)
-	if err != nil {
-		t.Errorf("%v", err)
-	}
 }
