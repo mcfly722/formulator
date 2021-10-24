@@ -91,16 +91,23 @@ func decompileHive(program *Program, i int) string {
 		return fmt.Sprintf("(%v%v%v)", operand1, program.Operators[instruction.operatorN].Name, operand2)
 	}
 
-	return "unknown instruction"
+	return fmt.Sprintf("unknown instruction kind:%v", instruction.kind)
 }
 
 // Decompile program to string representation
-func Decompile(program *Program) string {
-	if len(program.Instructions) == 0 {
-		return fmt.Sprintf(constants.ToString(*program.Constants[0]))
+func Decompile(program *Program) (string, error) {
+	if program != nil {
+		if len(program.Instructions) == 0 {
+			if len(program.Constants) > 0 {
+				return fmt.Sprintf(constants.ToString(*program.Constants[0])), nil
+			}
+			return "nil", fmt.Errorf("Decompile: program is empty")
+		}
+
+		return decompileHive(program, len(program.Instructions)-1), nil
 	}
 
-	return decompileHive(program, len(program.Instructions)-1)
+	return "nil", fmt.Errorf("Decompile: program pointer is nil")
 }
 
 func hiveCompilation(node *zeroOneTwoTree.Node, program *Program) *float64 {
