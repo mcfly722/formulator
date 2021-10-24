@@ -16,7 +16,13 @@ func testRecombination(t *testing.T, testBracketSequence string) {
 
 	i := 1
 	readyProgram := func(program *vm.Program) {
-		t.Log(fmt.Sprintf("%3v) %v          %v     %v     %v", i, constants.CombinationOfPointersToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " "), functions.CombinationToString(&program.Functions, " "), vm.Decompile(program)))
+
+		decompiled, err := vm.Decompile(program)
+		if err != nil {
+			t.Errorf("%v", err)
+		}
+
+		t.Log(fmt.Sprintf("%3v) %v          %v     %v     %v", i, constants.CombinationOfPointersToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " "), functions.CombinationToString(&program.Functions, " "), decompiled))
 		i++
 		if i > 30 {
 			os.Exit(0)
