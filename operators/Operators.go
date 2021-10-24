@@ -12,21 +12,26 @@ type Operator struct {
 	Name     string
 }
 
-// Operators all known operators
-var Operators = []*Operator{
-	{
-		Name:     "+",
-		Function: func(a float64, b float64) float64 { return a + b },
-	},
-	{
-		Name:     "*",
-		Function: func(a float64, b float64) float64 { return a * b },
-	},
-	{
-		Name:     "^",
-		Function: func(a float64, b float64) float64 { return math.Pow(a, b) },
-	},
+// Add operator
+var Add = Operator{
+	Name:     "+",
+	Function: func(a float64, b float64) float64 { return a + b },
 }
+
+// Multiply operator
+var Multiply = Operator{
+	Name:     "*",
+	Function: func(a float64, b float64) float64 { return a * b },
+}
+
+// Power operator
+var Power = Operator{
+	Name:     "^",
+	Function: func(a float64, b float64) float64 { return math.Pow(a, b) },
+}
+
+// Operators all known operators
+var Operators = []*Operator{&Add, &Multiply, &Power}
 
 // OperatorByName get operator by its name
 func OperatorByName(name string) (*Operator, error) {
