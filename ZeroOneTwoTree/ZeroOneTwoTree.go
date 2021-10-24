@@ -173,6 +173,10 @@ func findMoreThanOneChilds(node *Node) int {
 
 // BracketsToTree generates expression tree based on string of brackets
 func BracketsToTree(input string) (*Node, error) {
+	if input == "" {
+		return nil, fmt.Errorf("input string could not be empty")
+	}
+
 	root, err := bracketsToTree(input)
 	if err != nil {
 		return nil, err
