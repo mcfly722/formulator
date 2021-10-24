@@ -7,8 +7,6 @@ import (
 
 const testBracketSequence = "((()()))()"
 
-// go test -v constants.go constants_test.go
-
 func Test_Compilation(t *testing.T) {
 	sequence := testBracketSequence
 	program, err := Compile(sequence)

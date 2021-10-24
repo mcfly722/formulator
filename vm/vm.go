@@ -96,6 +96,10 @@ func decompileHive(program *Program, i int) string {
 
 // Decompile program to string representation
 func Decompile(program *Program) string {
+	if len(program.Instructions) == 0 {
+		return fmt.Sprintf(constants.ToString(*program.Constants[0]))
+	}
+
 	return decompileHive(program, len(program.Instructions)-1)
 }
 
