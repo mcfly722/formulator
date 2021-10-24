@@ -13,41 +13,48 @@ type Function struct {
 	Function func(a float64) float64
 }
 
-// Functions all known functions
-var Functions = []*Function{
-	{
-		Name:     "round",
-		Function: func(x float64) float64 { return math.Round(x) },
-	},
-	{
-		Name: "odd",
-		Function: func(x float64) float64 {
-			if int64(x)%2 == 1 {
-				return 1
-			}
-			if x == 0 {
-				return 0
-			}
-			return -1
-		},
-	},
-	{
-		Name:     "abs",
-		Function: func(x float64) float64 { return math.Abs(x) },
-	},
-	{
-		Name: "fact",
-		Function: func(x float64) float64 {
-			if x != float64(uint64(x)) {
-				panic("Factorial input must be a positive integer.")
-			}
-			var res *big.Int = new(big.Int)
-			res.MulRange(1, int64(x))
+// Round function
+var Round = Function{
+	Name:     "round",
+	Function: func(x float64) float64 { return math.Round(x) },
+}
 
-			return float64(res.Int64())
-		},
+// Odd funciton
+var Odd = Function{
+	Name: "odd",
+	Function: func(x float64) float64 {
+		if int64(x)%2 == 1 {
+			return 1
+		}
+		if x == 0 {
+			return 0
+		}
+		return -1
 	},
 }
+
+// Abs function
+var Abs = Function{
+	Name:     "abs",
+	Function: func(x float64) float64 { return math.Abs(x) },
+}
+
+// Factorial function
+var Factorial = Function{
+	Name: "fact",
+	Function: func(x float64) float64 {
+		if x != float64(uint64(x)) {
+			return math.NaN()
+		}
+		var res *big.Int = new(big.Int)
+		res.MulRange(1, int64(x))
+
+		return float64(res.Int64())
+	},
+}
+
+// Functions all known functions
+var Functions = []*Function{&Round, &Odd, &Abs, &Factorial}
 
 // FunctionByName get function by its name
 func FunctionByName(name string) (*Function, error) {
