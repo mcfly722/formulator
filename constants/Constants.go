@@ -5,14 +5,14 @@ import (
 	"strings"
 )
 
-// IterationIndex constant
-const IterationIndex = 2147483648 + 1
+// N constant
+const N = 2147483648 + 1
 
 // PreviousValue constant. Equal to argument if there are no arguments in furmula, else starts from 0
 const PreviousValue = 2147483648 + 2
 
-// Argument constant
-const Argument = 2147483648 + 3
+// X constant
+const X = 2147483648 + 3
 
 // AvailableConstants all available constants
 //var AvailableConstants = []float64{3, IterationIndex, PreviousIterationValue, Argument}
@@ -38,7 +38,7 @@ func nextCombinationDigit(
 			currentPreviousIterationValue := maxPreviousIterationValue
 			currentArguments := maxArguments
 
-			if v == IterationIndex {
+			if v == N {
 				currentIterationIndexes--
 			}
 
@@ -46,7 +46,7 @@ func nextCombinationDigit(
 				currentPreviousIterationValue--
 			}
 
-			if v == Argument {
+			if v == X {
 				currentArguments--
 			}
 
@@ -112,11 +112,11 @@ func Recombination(
 // ToString converts constant to string representation
 func ToString(constant float64) string {
 	switch constant {
-	case IterationIndex:
+	case N:
 		return "n"
 	case PreviousValue:
 		return "pv"
-	case Argument:
+	case X:
 		return "x"
 	default:
 		return fmt.Sprintf("%v", constant)
