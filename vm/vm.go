@@ -39,10 +39,12 @@ func (program *Program) Calculate() float64 {
 	for _, instruction := range program.Instructions {
 		if instruction.kind == function {
 			result = program.Functions[instruction.functionN].Function(*instruction.operand1)
+			//fmt.Println(fmt.Sprintf("%v(%v)=%v", program.Functions[instruction.functionN].Name, *instruction.operand1, result))
 		}
 
 		if instruction.kind == operator {
 			result = program.Operators[instruction.operatorN].Function(*instruction.operand1, *instruction.operand2)
+			//fmt.Println(fmt.Sprintf("%v%v%v=%v", *instruction.operand1, program.Operators[instruction.operatorN].Name, *instruction.operand2, result))
 		}
 
 		instruction.result = result
