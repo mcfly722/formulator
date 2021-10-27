@@ -3,7 +3,6 @@ package functions
 import (
 	"fmt"
 	"math"
-	"math/big"
 	"strings"
 )
 
@@ -43,13 +42,16 @@ var Abs = Function{
 var Factorial = Function{
 	Name: "fact",
 	Function: func(x float64) float64 {
-		if x != float64(uint64(x)) {
-			return math.NaN()
-		}
-		var res *big.Int = new(big.Int)
-		res.MulRange(1, int64(x))
+		var result float64 = 1
+		var i float64
 
-		return float64(res.Int64())
+		for i = 1; i <= x; i++ {
+			result = result * i
+			if math.IsNaN(result) || math.IsInf(result, 1) || math.IsInf(result, -1) {
+				return result
+			}
+		}
+		return result
 	},
 }
 
