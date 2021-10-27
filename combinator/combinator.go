@@ -37,7 +37,7 @@ func RecombineSequence(
 	maxPreviousIterationValue int,
 	maxArguments int,
 	previousIterationRequired bool,
-	readyProgram func(program *vm.Program)) error {
+	readyProgram func(program *vm.Program) bool) error {
 
 	program, err := vm.Compile(sequence)
 	if err != nil {
@@ -67,7 +67,10 @@ func RecombineSequence(
 			if len(program.Functions) > 0 {
 				functions.Recombination(availableFunctions, program.Functions, readyFunctions)
 			} else {
-				readyProgram(program)
+				continueCalculations := readyProgram(program)
+				if !continueCalculations {
+					return
+				}
 			}
 
 		}

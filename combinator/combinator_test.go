@@ -86,8 +86,9 @@ func Test_EXP(t *testing.T) {
 	i := 1
 
 	var deviationThreshold float64 = 1000000
+	var stopThreshold float64 = 1
 
-	readyProgram := func(program *vm.Program) {
+	readyProgram := func(program *vm.Program) bool {
 
 		deviation, err := CalculateDeviation(program, &points, deviationThreshold, 30, false)
 
@@ -95,18 +96,22 @@ func Test_EXP(t *testing.T) {
 			if deviation <= deviationThreshold {
 				deviationThreshold = deviation
 
-				fmt.Println(fmt.Sprintf("deviation threshold=%v", deviationThreshold))
-
 				decompiled, err := vm.Decompile(program)
 				if err != nil {
 					t.Errorf("%v", err)
 				}
 				fmt.Println(fmt.Sprintf("%3v) %v          %v     %v     %v", i, constants.CombinationOfPointersToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " "), functions.CombinationToString(&program.Functions, " "), decompiled))
+				fmt.Println(fmt.Sprintf("deviation = %v", deviationThreshold))
 
 			}
 		}
 
+		if deviation < stopThreshold == true {
+			return false
+		}
+
 		i++
+		return true
 	}
 
 	err := RecombineSequence(sequence, &availableConstants, availableFunctions, availableOperators, 2, 1, 1, true, readyProgram)
