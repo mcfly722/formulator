@@ -2,6 +2,8 @@ package combinator
 
 import (
 	"fmt"
+	"math"
+	"math/rand"
 	"testing"
 
 	"github.com/mcfly722/formulator/constants"
@@ -10,6 +12,7 @@ import (
 	"github.com/mcfly722/formulator/vm"
 )
 
+/*
 func testRecombination(t *testing.T, testBracketSequence string) {
 	t.Log(fmt.Sprintf("sequence: %v", testBracketSequence))
 
@@ -26,7 +29,7 @@ func testRecombination(t *testing.T, testBracketSequence string) {
 
 	}
 
-	err := RecombineSequence(testBracketSequence, &constants.AvailableConstants, functions.Functions, operators.Operators, readyProgram)
+	err := RecombineSequence(testBracketSequence, &constants.AvailableConstants, functions.Functions, operators.Operators, 1, 1, 1, false, readyProgram)
 	if err != nil {
 		t.Errorf("%v", err)
 	}
@@ -55,4 +58,60 @@ func Test_Recombination5(t *testing.T) {
 
 func Test_Recombination6(t *testing.T) {
 	testRecombination(t, "((()()))")
+}
+
+*/
+const TotalPoints = 30
+
+func Test_EXP(t *testing.T) {
+
+	var sequence = "((()())((())()))()"
+
+	var availableConstants = []float64{-1, constants.X, constants.N, constants.PreviousValue0, constants.PreviousValue1}
+	var availableFunctions = []*functions.Function{&functions.Factorial}
+	var availableOperators = []*operators.Operator{&operators.Add, &operators.Multiply, &operators.Power}
+
+	points := []Point{}
+
+	for i := 0; i < TotalPoints; i++ {
+		x := rand.Float64() * 10
+		point := Point{x, math.Exp(x)}
+		points = append(points, point)
+
+		t.Log(fmt.Sprintf("%2v) %2.8f %05.4f", i, point.X, point.Y))
+	}
+
+	t.Log(fmt.Sprintf("sequence: %v", sequence))
+
+	i := 1
+
+	var deviationThreshold float64 = 1000000
+
+	readyProgram := func(program *vm.Program) {
+
+		deviation, err := CalculateDeviation(program, &points, deviationThreshold, 30, false)
+
+		if err == nil {
+			if deviation <= deviationThreshold {
+				deviationThreshold = deviation
+
+				fmt.Println(fmt.Sprintf("deviation threshold=%v", deviationThreshold))
+
+				decompiled, err := vm.Decompile(program)
+				if err != nil {
+					t.Errorf("%v", err)
+				}
+				fmt.Println(fmt.Sprintf("%3v) %v          %v     %v     %v", i, constants.CombinationOfPointersToString(&program.Constants, " "), operators.CombinationToString(&program.Operators, " "), functions.CombinationToString(&program.Functions, " "), decompiled))
+
+			}
+		}
+
+		i++
+	}
+
+	err := RecombineSequence(sequence, &availableConstants, availableFunctions, availableOperators, 2, 1, 1, true, readyProgram)
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+
 }
