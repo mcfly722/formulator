@@ -8,136 +8,23 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"sync"
-	"time"
 
 	"github.com/mcfly722/formulator/combinator"
-	"github.com/mcfly722/formulator/zeroOneTwoTree"
 
 	"github.com/gorilla/mux"
 )
 
-const tasksBatchSize = 5
-
 // APIServer ...
 type APIServer struct {
-	router  *mux.Router
-	context *Context
-}
-
-// Context ...
-type Context struct {
-	counter      uint64
-	lastSequence string
-	tasks        []*WorkingTask
-	Points       *[]combinator.Point
-	ready        sync.Mutex
-}
-
-// WorkingTask ...
-type WorkingTask struct {
-	Number            uint64
-	StartingSequence  string
-	EndingSequence    string
-	NumberOfSequences int
-	Agent             string
-	StartedAt         time.Time
-	Restarted         uint64
-	FinishedAt        time.Time
-}
-
-const workingTaskThresholdSec = 5
-
-func (ctx *Context) getNewTask(agent string) (string, error) {
-	ctx.ready.Lock()
-
-	var task *WorkingTask
-
-	// try to search outdated task and restart it
-	for i := 0; i < len(ctx.tasks); i++ {
-		if time.Now().Sub(ctx.tasks[i].StartedAt).Seconds() > workingTaskThresholdSec {
-			task = ctx.tasks[i]
-			task.Restarted++
-			break
-		}
-	}
-
-	// add new task
-	if task == nil {
-
-		task = &WorkingTask{
-			Number:            ctx.counter,
-			StartingSequence:  ctx.lastSequence,
-			Agent:             agent,
-			NumberOfSequences: tasksBatchSize,
-		}
-
-		for i := 0; i < tasksBatchSize; i++ {
-			nextSequence, err := zeroOneTwoTree.GetNextBracketsSequence(ctx.lastSequence, 2)
-
-			if err != nil {
-				panic(err)
-			}
-
-			if i < tasksBatchSize-1 {
-				task.EndingSequence = nextSequence
-			}
-
-			ctx.lastSequence = nextSequence
-		}
-
-		ctx.counter++
-
-		ctx.tasks = append(ctx.tasks, task)
-	}
-
-	task.StartedAt = time.Now()
-
-	ctx.ready.Unlock()
-	taskString, err := json.Marshal([]WorkingTask{*task})
-
-	if err != nil {
-		return "", err
-	}
-
-	return string(taskString), nil
-}
-
-// ToHTML ...
-func (ctx *Context) ToHTML() string {
-	ctx.ready.Lock()
-	out := "<table border=1px cellpadding='10' cellspacing='0'><tr><td>#</td><td>Starting Sequence</td><td>Ending Sequence</td><td>Batch Size</td><td>agent</td><td>Started At</td><td>Restarted</td><td>Elapsed(sec)</td></tr>"
-	for _, task := range ctx.tasks {
-		out += task.ToHTML()
-	}
-	out += "</table>"
-	ctx.ready.Unlock()
-	return out
-}
-
-// ToHTML ...
-func (task *WorkingTask) ToHTML() string {
-	var duration time.Duration
-
-	if task.FinishedAt.IsZero() {
-		duration = time.Now().Sub(task.StartedAt)
-	} else {
-		duration = time.Now().Sub(task.FinishedAt)
-	}
-
-	return fmt.Sprintf("<tr><td>%v</td><td>%v</td><td>%v</td><td>%v</td><td>%v</td><td>%v</td><td>%v</td><td>%v</td></tr>", task.Number, task.StartingSequence, task.EndingSequence, tasksBatchSize, task.Agent, task.StartedAt.Format(time.RFC3339), task.Restarted, uint64(duration.Seconds()))
+	router    *mux.Router
+	scheduler *Scheduler
 }
 
 // NewAPIServer ...
-func NewAPIServer(_points *[]combinator.Point) *APIServer {
+func NewAPIServer(points *[]combinator.Point) *APIServer {
 	return &APIServer{
-		router: mux.NewRouter(),
-		context: &Context{
-			counter:      0,
-			lastSequence: "()",
-			tasks:        []*WorkingTask{},
-			Points:       _points,
-		},
+		router:    mux.NewRouter(),
+		scheduler: NewScheduler(points),
 	}
 }
 
@@ -153,16 +40,15 @@ func (s *APIServer) Start(bindAddr string) error {
 
 func (s *APIServer) handleTasks() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		out := fmt.Sprintf("<html>%v</html>", s.context.ToHTML())
+		out := fmt.Sprintf("<html>%v</html>", s.scheduler.ToHTML())
 		io.WriteString(w, out)
 	}
-
 }
 
 func (s *APIServer) getTask() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		taskString, err := s.context.getNewTask(r.RemoteAddr)
+		taskString, err := s.scheduler.getNewTask(r.RemoteAddr)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 		}
@@ -174,10 +60,9 @@ func (s *APIServer) getTask() http.HandlerFunc {
 func (s *APIServer) getPoints() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		pointsString, _ := json.Marshal(s.context.Points)
+		pointsString, _ := json.Marshal(s.scheduler.Points)
 		io.WriteString(w, string(pointsString))
 	}
-
 }
 
 var (
