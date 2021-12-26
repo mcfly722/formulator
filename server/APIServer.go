@@ -5,15 +5,19 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 
+	"github.com/mcfly722/formulator/combinator"
 	"github.com/mcfly722/formulator/zeroOneTwoTree"
 
 	"github.com/gorilla/mux"
 )
+
+const tasksBatchSize = 5
 
 // APIServer ...
 type APIServer struct {
@@ -26,18 +30,20 @@ type Context struct {
 	counter      uint64
 	lastSequence string
 	tasks        []*WorkingTask
-
-	ready sync.Mutex
+	Points       *[]combinator.Point
+	ready        sync.Mutex
 }
 
 // WorkingTask ...
 type WorkingTask struct {
-	Number     uint64
-	Sequence   string
-	Agent      string
-	StartedAt  time.Time
-	Restarted  uint64
-	FinishedAt time.Time
+	Number            uint64
+	StartingSequence  string
+	EndingSequence    string
+	NumberOfSequences int
+	Agent             string
+	StartedAt         time.Time
+	Restarted         uint64
+	FinishedAt        time.Time
 }
 
 const workingTaskThresholdSec = 5
@@ -60,18 +66,25 @@ func (ctx *Context) getNewTask(agent string) (string, error) {
 	if task == nil {
 
 		task = &WorkingTask{
-			Number:   ctx.counter,
-			Sequence: ctx.lastSequence,
-			Agent:    agent,
+			Number:            ctx.counter,
+			StartingSequence:  ctx.lastSequence,
+			Agent:             agent,
+			NumberOfSequences: tasksBatchSize,
 		}
 
-		nextSequence, err := zeroOneTwoTree.GetNextBracketsSequence(ctx.lastSequence, 2)
+		for i := 0; i < tasksBatchSize; i++ {
+			nextSequence, err := zeroOneTwoTree.GetNextBracketsSequence(ctx.lastSequence, 2)
 
-		if err != nil {
-			panic(err)
+			if err != nil {
+				panic(err)
+			}
+
+			if i < tasksBatchSize-1 {
+				task.EndingSequence = nextSequence
+			}
+
+			ctx.lastSequence = nextSequence
 		}
-
-		ctx.lastSequence = nextSequence
 
 		ctx.counter++
 
@@ -81,7 +94,7 @@ func (ctx *Context) getNewTask(agent string) (string, error) {
 	task.StartedAt = time.Now()
 
 	ctx.ready.Unlock()
-	taskString, err := json.Marshal(task)
+	taskString, err := json.Marshal([]WorkingTask{*task})
 
 	if err != nil {
 		return "", err
@@ -93,7 +106,7 @@ func (ctx *Context) getNewTask(agent string) (string, error) {
 // ToHTML ...
 func (ctx *Context) ToHTML() string {
 	ctx.ready.Lock()
-	out := "<table border=1px cellpadding='10' cellspacing='0'><tr><td>#</td><td>sequence</td><td>agent</td><td>Started At</td><td>Restarted</td><td>Elapsed(sec)</td></tr>"
+	out := "<table border=1px cellpadding='10' cellspacing='0'><tr><td>#</td><td>Starting Sequence</td><td>Ending Sequence</td><td>Batch Size</td><td>agent</td><td>Started At</td><td>Restarted</td><td>Elapsed(sec)</td></tr>"
 	for _, task := range ctx.tasks {
 		out += task.ToHTML()
 	}
@@ -112,17 +125,18 @@ func (task *WorkingTask) ToHTML() string {
 		duration = time.Now().Sub(task.FinishedAt)
 	}
 
-	return fmt.Sprintf("<tr><td>%v</td><td>%v</td><td>%v</td><td>%v</td><td>%v</td><td>%v</td></tr>", task.Number, task.Sequence, task.Agent, task.StartedAt.Format(time.RFC3339), task.Restarted, uint64(duration.Seconds()))
+	return fmt.Sprintf("<tr><td>%v</td><td>%v</td><td>%v</td><td>%v</td><td>%v</td><td>%v</td><td>%v</td><td>%v</td></tr>", task.Number, task.StartingSequence, task.EndingSequence, tasksBatchSize, task.Agent, task.StartedAt.Format(time.RFC3339), task.Restarted, uint64(duration.Seconds()))
 }
 
 // NewAPIServer ...
-func NewAPIServer() *APIServer {
+func NewAPIServer(_points *[]combinator.Point) *APIServer {
 	return &APIServer{
 		router: mux.NewRouter(),
 		context: &Context{
 			counter:      0,
 			lastSequence: "()",
 			tasks:        []*WorkingTask{},
+			Points:       _points,
 		},
 	}
 }
@@ -131,6 +145,7 @@ func NewAPIServer() *APIServer {
 func (s *APIServer) Start(bindAddr string) error {
 	s.router.HandleFunc("/", s.handleTasks())
 	s.router.HandleFunc("/getTask", s.getTask())
+	s.router.HandleFunc("/getPoints", s.getPoints())
 
 	fmt.Println(fmt.Sprintf("starting server on %v", bindAddr))
 	return http.ListenAndServe(bindAddr, s.router)
@@ -156,17 +171,40 @@ func (s *APIServer) getTask() http.HandlerFunc {
 
 }
 
+func (s *APIServer) getPoints() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		pointsString, _ := json.Marshal(s.context.Points)
+		io.WriteString(w, string(pointsString))
+	}
+
+}
+
 var (
-	bindAddrFlag  *string
-	stateFileFlag *string
+	bindAddrFlag    *string
+	stateFileFlag   *string
+	samplesFileFlag *string
 )
 
 func main() {
 
-	bindAddrFlag = flag.String("bindAddr", ":8080", "bind address")
+	bindAddrFlag = flag.String("bindAddr", "127.0.0.1:8080", "bind address")
 	stateFileFlag = flag.String("stateFile", "state.json", "file for current state")
+	samplesFileFlag = flag.String("samplesFile", "..\\samples\\exponent\\exponent.json", "file of points for required function")
 
-	server := NewAPIServer()
+	body, err := ioutil.ReadFile(*samplesFileFlag)
+	if err != nil {
+		panic(err)
+	}
+
+	points := []combinator.Point{}
+
+	err = json.Unmarshal(body, &points)
+	if err != nil {
+		panic(err)
+	}
+
+	server := NewAPIServer(&points)
 	if err := server.Start(*bindAddrFlag); err != nil {
 		log.Fatal(err)
 	}
