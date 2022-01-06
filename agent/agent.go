@@ -4,12 +4,18 @@ import (
 	"flag"
 	"fmt"
 	"time"
+
+	"github.com/mcfly722/formulator/zeroOneTwoTree"
 )
 
 var (
 	serverAddrFlag    *string
 	errorSleepSecFlag *int
 )
+
+func recombine(sequence string) {
+	fmt.Println(fmt.Sprintf("%v", sequence))
+}
 
 func main() {
 	serverAddrFlag = flag.String("server", "http://127.0.0.1:8080", "server address")
@@ -33,6 +39,19 @@ func main() {
 		} else {
 
 			fmt.Println(fmt.Sprintf("%v", task))
+
+			sequence := task.StartingSequence
+			for i := 0; i < task.NumberOfSequences; i++ {
+
+				recombine(sequence)
+
+				nextSequence, err := zeroOneTwoTree.GetNextBracketsSequence(sequence, 2)
+				if err != nil {
+					panic(err)
+				}
+				sequence = nextSequence
+			}
+
 			time.Sleep(time.Second)
 		}
 	}
