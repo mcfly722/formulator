@@ -38,7 +38,7 @@ func NewScheduler(points *[]combinator.Point) *Scheduler {
 	go func() {
 		for {
 			scheduler.ready.Lock()
-			fmt.Println(fmt.Sprintf("."))
+			fmt.Printf(fmt.Sprintf("."))
 			scheduler.ready.Unlock()
 			time.Sleep(1 * time.Second)
 		}
