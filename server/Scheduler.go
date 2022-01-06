@@ -106,7 +106,7 @@ func (scheduler *Scheduler) getNewTask(agent string) (string, error) {
 	task.StartedAt = time.Now()
 
 	scheduler.ready.Unlock()
-	taskString, err := json.Marshal([]WorkingTask{*task})
+	taskString, err := json.Marshal(*task)
 
 	if err != nil {
 		return "", err
