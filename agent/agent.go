@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"time"
 )
 
 var (
@@ -24,16 +25,15 @@ func main() {
 	fmt.Println(fmt.Sprintf("obtained %v points", len(*points)))
 
 	for {
+		task, err := GetTask(*serverAddrFlag)
 
-		/*
-			_, err := http.Get(fmt.Sprintf("%v/getTask", *serverAddrFlag))
-			if err != nil {
-				fmt.Println(fmt.Sprintf("error: %v sleeping %v sec", err, *errorSleepSecFlag))
-				time.Sleep(time.Second * time.Duration(*errorSleepSecFlag))
-			} else {
-				//
+		if err != nil {
+			fmt.Println(fmt.Sprintf("error: %v sleeping %v sec", err, *errorSleepSecFlag))
+			time.Sleep(time.Second * time.Duration(*errorSleepSecFlag))
+		} else {
 
-			}
-		*/
+			fmt.Println(fmt.Sprintf("%v", task))
+			time.Sleep(time.Second)
+		}
 	}
 }

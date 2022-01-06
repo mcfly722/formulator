@@ -36,3 +36,21 @@ func GetPoints(serverAddr string) (*([]combinator.Point), error) {
 
 	return &points, nil
 }
+
+// Task ...
+type Task struct {
+	Number            uint64
+	StartingSequence  string
+	EndingSequence    string
+	NumberOfSequences int
+}
+
+// GetTask ...
+func GetTask(serverAddr string) (*Task, error) {
+	var task Task
+	err := getHTTPJSON(fmt.Sprintf("%v/getTask", serverAddr), &task)
+	if err != nil {
+		return nil, err
+	}
+	return &task, nil
+}
