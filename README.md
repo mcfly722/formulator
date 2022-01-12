@@ -54,9 +54,7 @@ For upper squares it would be:
 ()()()() - excluded (has 4 childs for one node)
 ```
 
-* c) based on bracket sequence we build required tree
-
-To simplify all the process there are function <b>GetNextBracketsSequence(bracketSequence, maxChilds)</b> that return next sequence based on current sequence. (Function build it own square with path and recursively obtain next path that match to <b>maxChilds</b> condition)
+To simplify all the process there are function <b>GetNextBracketsSequence(bracketSequence, maxChilds)</b> that return next sequence based on current sequence. (Function build it own square with path and recursively obtain next path that match to <b>maxChilds</b> condition.Also it extends number of brackets if your specify last one sequence for this square size.)
 ```
 ZeroOneTwoTree\go test . -v
 ...
@@ -81,4 +79,5 @@ ZeroOneTwoTree\go test . -v
     ZeroOneTwoTree_test.go:145:  17)   2 ()(()(())) -> ()((()()))
 ```
 
-Tree builds from bracket sequence, bracket sequence generates from recursive
+* c) based on bracket sequence we build required form of tree
+![alt tag](https://raw.githubusercontent.com/mcfly722/formulator/main/doc/exp.svg)
