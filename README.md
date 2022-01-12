@@ -24,37 +24,35 @@ Instrument could be used to find currently unknown solutions for integrals, irra
 
  # how it works
  ## step 1 - Iterate over trees
-We need trees with only one or two childs for eny node.
+We need trees with only one or two childs for any node.
 Nodes without childs represents Constants/Arguments or recursive values (pv\*) of previous iteration.
-To iterate over all possible trees there used [Catalan method](https://en.wikipedia.org/wiki/Catalan_number).
+To iterate over all possible trees there used [Catalan method](https://en.wikipedia.org/wiki/Catalan_number).<br><br>
 basic steps are:<br>
 * a) we have a square and recursively build all paths from bottom left corner to upper right corner. This path should not cross over main diagonal and number of steps on each diagonal should not overcome 2, otherwise we would get bracket sequences with 3 or more childs for node which is not represented in math forms.<br>
 ![alt tag](https://raw.githubusercontent.com/mcfly722/formulator/main/doc/Catalan_number_4x4_grid_example.svg)
 
-* b) each path represent bracket sequence where every left arrow (&#10142;) equal to opened bracket and up arrow (&#129045;) is closed bracket.
+* b) each path represent bracket sequence where every left arrow (&#10142;) equal to opened bracket and up arrow (&#129045;) is closed bracket.<br><br>
 For upper squares it would be:
 ```
 (((())))
 ((()()))
 ((())())
 (()(()))
-```
-```
+...
 ()((()))
 (()()()) - excluded (has 3 childs for one node)
 ((()))()
 ()(()())
 (())(())
 (()())()
-```
-```
+...
 (())()() - excluded (has 3 childs for one node)
 ()(())() - excluded (has 3 childs for one node)
 ()()(()) - excluded (has 3 childs for one node)
 ()()()() - excluded (has 4 childs for one node)
 ```
 
-To simplify all the process there are function <b>GetNextBracketsSequence(bracketSequence, maxChilds)</b> that return next sequence based on current sequence. (Function build it own square with path and recursively obtain next path that match to <b>maxChilds</b> condition.Also it extends number of brackets if your specify last one sequence for this square size.)
+To simplify all the process there are function <b>GetNextBracketsSequence(bracketSequence, maxChilds)</b> that return next sequence based on current sequence (Function build it own square with path and recursively obtain next path that match to <b>maxChilds</b> condition.Also it extends number of brackets if your specify last one sequence for this square size).
 ```
 ZeroOneTwoTree\go test . -v
 ...
