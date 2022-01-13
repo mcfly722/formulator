@@ -83,10 +83,11 @@ ZeroOneTwoTree\go test . -v
  ## step 2 - Iterate over Constants
  From new tree form we know how many constants positions we have. (In sequence it is <b>"()"</b> brackets pairs)<br>
  We also know that previous value (0,1,x) should appear at least one time, otherwise iterations has no reason to be.
- TODO
+
+
+ TODO:
 
  ## step 3 - Iterate over Operators and Functions
-
  ## step 4 - Build calculation sequence
  ## step 5 - Calculate
  ## step 6 - Calculating [Variance](https://en.wikipedia.org/wiki/Variance) of points
