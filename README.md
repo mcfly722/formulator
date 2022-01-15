@@ -89,7 +89,7 @@ last product could not be equal to 0, otherwise all final product will be equal 
 Number of pv's should not be equal to zero, so we iterate it from 1 to <b>maxPVs</b>
 
 ## step 4 Constants with Previous Value (pv) combination
-To combine pv's with constants in all tree leafs here used lexicographic method (see [The Art of computer Programming](https://www.kcats.org/csci/464/doc/knuth/fascicles/fasc3a.pdf) page 22)
+To combine pv's with constants in all tree leafs here used lexicographic method (see [The Art of computer Programming](https://www.kcats.org/csci/464/doc/knuth/fascicles/fasc3a.pdf) page 21)
 
 test sample 3 from 8:
 
