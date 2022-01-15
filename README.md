@@ -61,17 +61,17 @@ ZeroOneTwoTree\go test . -v
 * c) based on bracket sequence we build required form of tree
 ![alt tag](https://raw.githubusercontent.com/mcfly722/formulator/main/doc/exp.svg)
 
- ## step 2 - Iterate over Previous Values (pv) forms (0,1,x)
+## step 2 - Iterate over Previous Values (pv) forms (0,1,x)
 
  From new tree form we know how many constants positions we have. (In sequence it is <b>"()"</b> brackets pairs)<br>
- We also know that previous value (0,1,x) should appear at least one time, otherwise iterations has no reason to be. Also it could not mix with each other (0 could not mixed with 1 or x in one recursive function)
+ We also know that previous value (0,1,x) should appear at least one time, otherwise iterations has no reason to be.
 
  Examples:<br>
 
 * <b>pv = 0<br></b>
  Computing exp(z) using [Euler formula](https://en.wikipedia.org/wiki/Euler%27s_formula):<br>
  ![alt tag](https://wikimedia.org/api/rest_v1/media/math/render/svg/6a91595ef0946463456b2d0184bdcdb2ae9da7a2)<br>
- last recursive sum should be equal to 0. If we take pv = 1, we will get wrong answer = exp(z)+1
+ last recursive sum should be equal to 0. If we take pv = 1, we will get wrong final answer &#8776; exp(z)+1
 <br><br><br>
 * <b>pv = 1<br></b>
  Computing Pi using [Wallis product](https://en.wikipedia.org/wiki/Wallis_product):<br>
@@ -85,21 +85,84 @@ last product could not be equal to 0, otherwise all final product will be equal 
  ![alt tag](https://wikimedia.org/api/rest_v1/media/math/render/svg/a8788bf85d532fa88d1fb25eff6ae382a601c308) could not be 0 or 1 and should be equal to initial function argument x
 <br><br><br>
 
+## step 3 Itarate through number of Previous Values (pv)
+Number of pv's should not be equal to zero, so we iterate it from 1 to <b>maxPVs</b>
 
+## step 4 Constants with Previous Value (pv) combination
+To combine pv's with constants in all tree leafs used lexicographic method through recursive function (see [The Art of computer Programming](https://www.kcats.org/csci/464/doc/knuth/fascicles/fasc3a.pdf) page 22)
 
+test sample 3 from 8:
 
+```
+\catalan> go test -v .
+...
+=== RUN   Test_CombinationNKNext
+--- PASS: Test_CombinationNKNext (0.00s)
+    Catalan_test.go:210:  1 ***..... = 224
+    Catalan_test.go:210:  2 **.*.... = 208
+    Catalan_test.go:210:  3 **..*... = 200
+    Catalan_test.go:210:  4 **...*.. = 196
+    Catalan_test.go:210:  5 **....*. = 194
+    Catalan_test.go:210:  6 **.....* = 193
+    Catalan_test.go:210:  7 *.**.... = 176
+    Catalan_test.go:210:  8 *.*.*... = 168
+    Catalan_test.go:210:  9 *.*..*.. = 164
+    Catalan_test.go:210: 10 *.*...*. = 162
+    Catalan_test.go:210: 11 *.*....* = 161
+    Catalan_test.go:210: 12 *..**... = 152
+    Catalan_test.go:210: 13 *..*.*.. = 148
+    Catalan_test.go:210: 14 *..*..*. = 146
+    Catalan_test.go:210: 15 *..*...* = 145
+    Catalan_test.go:210: 16 *...**.. = 140
+    Catalan_test.go:210: 17 *...*.*. = 138
+    Catalan_test.go:210: 18 *...*..* = 137
+    Catalan_test.go:210: 19 *....**. = 134
+    Catalan_test.go:210: 20 *....*.* = 133
+    Catalan_test.go:210: 21 *.....** = 131
+    Catalan_test.go:210: 22 .***.... = 112
+    Catalan_test.go:210: 23 .**.*... = 104
+    Catalan_test.go:210: 24 .**..*.. = 100
+    Catalan_test.go:210: 25 .**...*. = 98
+    Catalan_test.go:210: 26 .**....* = 97
+    Catalan_test.go:210: 27 .*.**... = 88
+    Catalan_test.go:210: 28 .*.*.*.. = 84
+    Catalan_test.go:210: 29 .*.*..*. = 82
+    Catalan_test.go:210: 30 .*.*...* = 81
+    Catalan_test.go:210: 31 .*..**.. = 76
+    Catalan_test.go:210: 32 .*..*.*. = 74
+    Catalan_test.go:210: 33 .*..*..* = 73
+    Catalan_test.go:210: 34 .*...**. = 70
+    Catalan_test.go:210: 35 .*...*.* = 69
+    Catalan_test.go:210: 36 .*....** = 67
+    Catalan_test.go:210: 37 ..***... = 56
+    Catalan_test.go:210: 38 ..**.*.. = 52
+    Catalan_test.go:210: 39 ..**..*. = 50
+    Catalan_test.go:210: 40 ..**...* = 49
+    Catalan_test.go:210: 41 ..*.**.. = 44
+    Catalan_test.go:210: 42 ..*.*.*. = 42
+    Catalan_test.go:210: 43 ..*.*..* = 41
+    Catalan_test.go:210: 44 ..*..**. = 38
+    Catalan_test.go:210: 45 ..*..*.* = 37
+    Catalan_test.go:210: 46 ..*...** = 35
+    Catalan_test.go:210: 47 ...***.. = 28
+    Catalan_test.go:210: 48 ...**.*. = 26
+    Catalan_test.go:210: 49 ...**..* = 25
+    Catalan_test.go:210: 50 ...*.**. = 22
+    Catalan_test.go:210: 51 ...*.*.* = 21
+    Catalan_test.go:210: 52 ...*..** = 19
+    Catalan_test.go:210: 53 ....***. = 14
+    Catalan_test.go:210: 54 ....**.* = 13
+    Catalan_test.go:210: 55 ....*.** = 11
+    Catalan_test.go:210: 56 .....*** = 7
+PASS
+```
+Main function that generates next combination based on previous one is <b>CombinationNKNext(input string) (string, bool, error)</b>
 
-
-
-
-
-
-
-
+<br><br><br><br><br><br><br><br><br>
 
  TODO:
 
- ## step 3 - Iterate over Operators and Functions
- ## step 4 - Build calculation sequence
- ## step 5 - Calculate
- ## step 6 - Calculating [Variance](https://en.wikipedia.org/wiki/Variance) of points
+ ## step 5- Iterate over Operators and Functions
+ ## step 6 - Build calculation sequence
+ ## step 7 - Calculate
+ ## step 8 - Calculating [Variance](https://en.wikipedia.org/wiki/Variance) of points
