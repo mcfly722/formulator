@@ -158,11 +158,18 @@ PASS
 ```
 Main function that generates next combination based on previous one is <b>CombinationNKNext(input string) (string, bool, error)</b>
 
-<br><br><br><br><br><br><br><br><br>
+ ## step 5 - Iterate over all Functions combinations
+ Number of functions in tree is known - it is all nodes with only one child.<br>
+ Unfortunately, trees contains different number of functions, so we cannot use simple <b>for(){}</b> inside other <b>for(){}</b>. To iterate variative number of <b>for's</b>, we also use <b>for(){}</b> through recursive function.
 
- TODO:
+ ## step 6 - Iterate over all Operator combinations
+ Same method (from step 5) used here.
 
- ## step 5- Iterate over Operators and Functions
+ <br><br><br><br><br><br><br><br><br>
+
+  TODO:
+
+
  ## step 6 - Build calculation sequence
  ## step 7 - Calculate
  ## step 8 - Calculating [Variance](https://en.wikipedia.org/wiki/Variance) of points
